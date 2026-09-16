@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "currentChapter": "volume_01_battle_mock",
+  "selectedSkill": "zhan",
+  "selectedCharacter": "shen_yan",
+  "unlockedChars": ["刀", "斩", "静", "定"],
+  "battleState": null,
+  "charMastery": {
+    "dao": {
+      "uses": 0,
+      "bestScore": 0,
+      "averageScore": 0
+    },
+    "zhan": {
+      "uses": 0,
+      "bestScore": 0,
+      "averageScore": 0
+    }
+  },
+  "settings": {
+    "sfxVolume": 0.8,
+    "bgmVolume": 0.6
+  },
+  "savedAt": null
+}

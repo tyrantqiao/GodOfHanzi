@@ -1,0 +1,55 @@
+{
+  "chapter": "第一卷 · 雪林醒魂",
+  "objective": "目标：击退霜藤妖",
+  "party": [
+    {
+      "id": "shen_yan",
+      "name": "沈砚",
+      "role": "主角",
+      "grade": 9,
+      "realm": "开窍境",
+      "level": 1,
+      "hp": 320,
+      "maxHp": 320,
+      "spirit": 100,
+      "maxSpirit": 100,
+      "action": 70,
+      "attack": 32,
+      "defense": 8,
+      "states": ["气", "墨", "守"]
+    },
+    {
+      "id": "lu_qingya",
+      "name": "陆青崖",
+      "role": "导师",
+      "grade": 7,
+      "realm": "通文境",
+      "level": 18,
+      "hp": 280,
+      "maxHp": 320,
+      "spirit": 90,
+      "maxSpirit": 100,
+      "action": 35,
+      "attack": 58,
+      "defense": 18,
+      "states": ["书", "静"]
+    }
+  ],
+  "enemy": {
+    "id": "frost_vine",
+    "name": "霜藤妖",
+    "grade": 9,
+    "realm": "入品妖",
+    "level": 3,
+    "hp": 180,
+    "maxHp": 180,
+    "spirit": 60,
+    "maxSpirit": 60,
+    "action": 52,
+    "attack": 24,
+    "defense": 6,
+    "states": ["狂暴"]
+  },
+  "equippedSkills": ["dao", "zhan", "jing", "ding"],
+  "selectedSkill": "zhan"
+}

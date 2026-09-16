@@ -646,7 +646,11 @@ MVP 不做复杂机器学习识别，先做底板匹配：
 
 当前已经拆分出的内容资产文档：
 
+- 系统设计：`docs/system/system-design.md`
+- 界面设计稿方案：`docs/system/ui-design-proposal.md`
 - 小说主线：`docs/narrative/haoran-main-story.md`
+- 故事角色组织脉络：`docs/narrative/story-map-and-factions.md`
+- 小说试读稿：`docs/narrative/novel-draft-001.md`
 - 汉字技能素材：`docs/content/hanzi-skill-catalog.md`
 - 诗文典籍素材：`docs/content/literary-skill-catalog.md`
 

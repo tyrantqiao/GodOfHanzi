@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>汉字成圣 - 对战界面原型</title>
+    <link rel="stylesheet" href="src/styles.css" />
+  </head>
+  <body>
+    <main class="game-shell" aria-label="汉字成圣对战界面原型">
+      <section class="battlefield" aria-label="战斗场景">
+        <div class="snow-layer"></div>
+        <header class="battle-topbar">
+          <div>
+            <span class="chapter">第一卷 · 雪林醒魂</span>
+            <span class="objective">目标：击退霜藤妖</span>
+          </div>
+          <button class="pause-button" type="button">暂停</button>
+        </header>
+
+        <aside class="enemy-panel" aria-label="敌方状态">
+          <div class="enemy-name">霜藤妖</div>
+          <div class="enemy-realm">九品 · 入品妖</div>
+          <div class="bar hp enemy-hp">
+            <span style="width: 100%"></span>
+            <strong>180/180</strong>
+          </div>
+          <div class="bar spirit enemy-spirit">
+            <span style="width: 100%"></span>
+            <strong>60/60</strong>
+          </div>
+        </aside>
+
+        <div class="stele stele-main">
+          <span>文<br />以<br />载<br />道</span>
+        </div>
+        <div class="stele stele-small"></div>
+
+        <div class="combatants">
+          <div class="party-side">
+            <div class="mentor sprite" aria-label="导师陆青崖">
+              <div class="mentor-head"></div>
+              <div class="mentor-body"></div>
+              <div class="mentor-staff"></div>
+            </div>
+
+            <div class="hero sprite" aria-label="主角沈砚">
+              <div class="hero-head"></div>
+              <div class="hero-body"></div>
+              <div class="hero-arm left"></div>
+              <div class="hero-arm right"></div>
+              <div class="hero-leg left"></div>
+              <div class="hero-leg right"></div>
+              <div class="brush"></div>
+              <div class="scarf"></div>
+            </div>
+          </div>
+
+          <div class="preview-layer" aria-hidden="true">
+            <div class="ink-slash"></div>
+            <div class="preview-arrow"></div>
+            <div class="preview-label">斩击预览</div>
+          </div>
+
+          <div class="enemy frost-vine" aria-label="敌人霜藤妖">
+            <div class="vine-core"></div>
+            <div class="vine vine-a"></div>
+            <div class="vine vine-b"></div>
+            <div class="vine vine-c"></div>
+            <div class="vine vine-d"></div>
+            <div class="thorn thorn-a"></div>
+            <div class="thorn thorn-b"></div>
+            <div class="enemy-shadow"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="hud" aria-label="战斗操作栏">
+        <div class="characters-panel">
+          <article class="status-card active" data-character="shen_yan" tabindex="0">
+            <div class="portrait portrait-hero">
+              <span>文</span>
+            </div>
+            <div class="status-content">
+              <div class="character-line">
+                <strong class="character-name">沈砚</strong>
+                <span class="character-realm">九品 · 开窍境</span>
+              </div>
+              <div class="bar hp">
+                <span style="width: 100%"></span>
+                <strong>320/320</strong>
+              </div>
+              <div class="bar spirit">
+                <span style="width: 100%"></span>
+                <strong>100/100</strong>
+              </div>
+              <div class="status-icons">
+                <i>气</i>
+                <i>墨</i>
+                <i>守</i>
+              </div>
+            </div>
+          </article>
+
+          <article class="status-card" data-character="lu_qingya" tabindex="0">
+            <div class="portrait portrait-mentor">
+              <span>师</span>
+            </div>
+            <div class="status-content">
+              <div class="character-line">
+                <strong class="character-name">陆青崖</strong>
+                <span class="character-realm">七品 · 通文境</span>
+              </div>
+              <div class="bar hp">
+                <span style="width: 88%"></span>
+                <strong>280/320</strong>
+              </div>
+              <div class="bar spirit">
+                <span style="width: 90%"></span>
+                <strong>90/100</strong>
+              </div>
+              <div class="status-icons muted">
+                <i>书</i>
+                <i>静</i>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="skills-panel" role="list" aria-label="汉字技能">
+          <button class="skill-card" type="button" data-skill="dao" role="listitem">
+            <span class="skill-char">刀</span>
+            <span class="skill-name">墨刀</span>
+          </button>
+          <button class="skill-card selected" type="button" data-skill="zhan" role="listitem">
+            <span class="skill-char">斩</span>
+            <span class="skill-name">一字斩</span>
+          </button>
+          <button class="skill-card" type="button" data-skill="jing" role="listitem">
+            <span class="skill-char">静</span>
+            <span class="skill-name">静心</span>
+          </button>
+          <button class="skill-card" type="button" data-skill="ding" role="listitem">
+            <span class="skill-char">定</span>
+            <span class="skill-name">定身</span>
+          </button>
+        </div>
+
+        <div class="ink-dots" aria-label="当前墨点">
+          <span class="filled"></span>
+          <span class="filled"></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+
+        <aside class="info-panel" aria-live="polite">
+          <div class="info-title">一字斩</div>
+          <p class="info-text">凝字为刃，对霜藤妖造成斩击伤害。克制藤蔓，命中后小幅击退行动条。</p>
+          <div class="info-tags">
+            <span>攻击</span>
+            <span>克藤</span>
+            <span>需书写</span>
+          </div>
+          <button class="cast-button" type="button">确认书写</button>
+          <div class="combat-log">战斗记录：沈砚正在观望霜藤妖。</div>
+          <div class="save-actions" aria-label="存档操作">
+            <button class="save-button" type="button">保存进度</button>
+            <button class="load-button" type="button">读取存档</button>
+          </div>
+          <div class="save-status">存档：尚未操作</div>
+        </aside>
+      </section>
+    </main>
+
+    <script type="module" src="src/main.js"></script>
+  </body>
+</html>
