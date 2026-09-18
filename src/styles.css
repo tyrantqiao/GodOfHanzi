@@ -737,7 +737,7 @@ button {
   display: block;
   margin-top: clamp(8px, 1.5vh, 14px);
   font-family: "STKaiti", "KaiTi", "SimSun", serif;
-  font-size: clamp(58px, min(7vw, 10.5vh), 110px);
+  font-size: 72px;
   font-weight: 900;
   line-height: 0.95;
   letter-spacing: 0;
@@ -898,4 +898,102 @@ button {
     width: min(100vw, calc(100dvh * 16 / 9));
     width: min(100vw, calc(100svh * 16 / 9));
   }
+}
+
+/* Reserve natural space for controls; only the battlefield may shrink. */
+body { min-height: 100dvh; overflow: auto; padding: 12px 12px 24px; }
+.game-shell { width: min(100%, 1600px); height: auto; min-height: calc(100dvh - 36px); aspect-ratio: auto; grid-template-rows: minmax(320px, 1fr) auto; overflow: visible; }
+.battlefield { min-height: 320px; }
+.hud { grid-template-columns: minmax(260px, 1fr) minmax(320px, 1.25fr) minmax(250px, 1fr); grid-template-rows: auto; gap: 20px; padding: 18px; }
+.characters-panel, .info-panel { grid-row: auto; }
+.characters-panel { gap: 12px; align-content: start; }
+.status-card { grid-template-columns: 58px minmax(0,1fr); gap: 10px; padding: 6px; }
+.portrait { width: 54px; height: 54px; }
+.portrait span { font-size: 26px; }
+.status-content { gap: 5px; min-width: 0; }
+.character-line { flex-wrap: wrap; gap: 2px 8px; }
+.status-icons { gap: 5px; flex-wrap: wrap; }
+.status-icons i { width: 23px; height: 23px; }
+.skills-panel { grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; align-self: center; }
+.skill-card { height: 156px; display: grid; grid-template-rows: 1fr auto auto; justify-items: center; align-items: center; padding: 10px 4px; gap: 5px; }
+.skill-char { margin: 0; font-size: 60px; line-height: 1.15; }
+.skill-name { position: static; font-size: 12px; padding: 2px 5px; }
+.skill-cost { font-size: 12px; position: relative; }
+.skill-card.unavailable { filter: saturate(.4); }
+.ink-dots { display: none; }
+.info-panel { grid-column: auto; padding: 12px; min-width: 0; }
+.info-title { font-size: 20px; margin-bottom: 6px; }
+.info-text { font-size: 13px; margin-bottom: 8px; line-height: 1.5; overflow-wrap: anywhere; }
+.info-tags { gap: 4px; margin-bottom: 10px; }
+.info-tags span { padding: 3px 6px; border-radius: 4px; font-size: 12px; }
+.combat-log { overflow-wrap: anywhere; }
+#turn-label { display: block; margin-top: 4px; font-size: 13px; color: #78401c; }
+#rest-button { width: 100%; margin-top: 8px; padding: 8px; border: 1px solid #82765e; border-radius: 4px; color: #f1e4c9; background: #303631; cursor: pointer; }
+#rest-button:disabled { opacity: .5; cursor: not-allowed; }
+.enemy-panel { width: 240px; }
+.battle-topbar > div { padding: 5px 8px; background: rgba(240,244,240,.86); border-radius: 4px; }
+.enemy { right: 20%; bottom: 3%; transform: scale(.65); transform-origin: bottom right; }
+.enemy-panel .bar + .bar { margin-top: 4px; }
+.preview-layer { height: auto; top: 42%; left: 40%; right: 30%; }
+.ink-slash { width: 100%; }
+.preview-label { position: relative; left: 0; bottom: auto; top: 72px; width: max-content; max-width: 220px; }
+.enemy.targeted { filter: drop-shadow(0 0 12px #dfc777); }
+.sprite.acting { animation: castMotion .4s ease; }
+.enemy.hit, .sprite.hit { animation: hitMotion .35s ease; }
+.floating-number { position: absolute; z-index: 9; top: 42%; font-size: 28px; font-weight: bold; color: #a72d20; text-shadow: 0 1px 2px white; pointer-events: none; animation: floatNumber .9s ease forwards; }
+@keyframes castMotion { 50% { translate: 20px 0; } }
+@keyframes hitMotion { 25% { translate: -8px 0; opacity: .5; } 75% { translate: 8px 0; } }
+@keyframes floatNumber { to { translate: 0 -50px; opacity: 0; } }
+dialog { width: min(460px,calc(100vw - 24px)); max-height: calc(100dvh - 32px); overflow: auto; border: 1px solid #938570; border-radius: 8px; background: #202322; color: #f8f2e6; padding: 20px; }
+dialog::backdrop { background: #000a; }
+dialog h2 { font-size: 22px; margin: 0 0 12px; }
+dialog button { border: 1px solid #958462; border-radius: 4px; background: #343a36; color: #fff3d9; padding: 10px 16px; cursor: pointer; }
+.close-button { float: right; }
+.dialog-actions { display: flex; gap: 12px; }
+#writing-canvas { display: block; width: min(100%, 400px, 48dvh); aspect-ratio: 1; margin: auto; touch-action: none; background: #f1e9d9; border: 1px solid #9c8d72; cursor: crosshair; }
+.writing-meta, #writing-result { font-size: 14px; }
+.writing-meta { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 12px 0; }
+#writing-countdown { font-variant-numeric: tabular-nums; min-width: 4em; text-align: right; color: #f1c86b; }
+#writing-countdown.urgent { color: #ff9183; font-weight: 700; }
+.writing-verdict { position: absolute; z-index: 12; top: 20%; left: 22%; max-width: 54%; padding: 8px 12px; background: #f2eee7ed; color: #272d28; border-left: 3px solid #455649; pointer-events: none; }
+.writing-verdict strong, .writing-verdict span { display: block; }
+.writing-verdict strong { font-size: 20px; }
+.writing-verdict span { margin-top: 4px; font-size: 12px; }
+.writing-verdict.perfect { border-color: #9a6b12; color: #77470b; box-shadow: 0 0 22px #f2cf7680; }
+.writing-verdict.flooded { border-color: #9c312a; color: #9c312a; }
+.enemy-taunt { position: absolute; z-index: 13; right: 13%; bottom: 12%; padding: 8px 12px; background: #fff8ed; color: #6d302a; border: 1px solid #463c33; border-radius: 6px; font-size: 16px; pointer-events: none; }
+.ink-burst { position: absolute; z-index: 11; top: 48%; color: #101815; font: bold 64px KaiTi, serif; pointer-events: none; animation: inkFlight 900ms ease-in forwards; }
+.ink-burst.perfect { font-size: 100px; text-shadow: 2px 2px #efce78, -2px -2px #efce78; }
+.ink-burst.weak { font-size: 24px; opacity: .45; }
+.ink-burst i { position: absolute; left: 50%; top: 50%; width: 12px; height: 8px; border-radius: 50% 10% 50% 20%; background: #14221e; animation: inkSplash 900ms ease-out forwards; }
+@keyframes inkFlight { 0% { transform: scale(.4) rotate(-18deg); opacity: 0; } 20% { opacity: 1; transform: scale(1.1); } 75% { left: 66%; opacity: 1; } 100% { left: 68%; transform: scale(1.6); opacity: 0; } }
+@keyframes inkSplash { 0%, 55% { transform: scale(0); } 85% { opacity: 1; } 100% { transform: translate(var(--dx), var(--dy)) scale(.4); opacity: 0; } }
+@media(max-width:640px) { .writing-verdict { left: 8px; top: 34%; max-width: 62%; } .writing-verdict strong { font-size: 16px; } .enemy-taunt { right: 6px; bottom: 4%; font-size: 13px; } }
+@media(prefers-reduced-motion:reduce) { .ink-burst, .ink-burst i { animation-duration: .1s; } }
+button:focus-visible, .status-card:focus-visible { outline: 2px solid #f1c86b; outline-offset: 3px; }
+@media(max-width: 1050px) {
+  .hud { grid-template-columns: minmax(260px,1fr) minmax(300px,1fr); }
+  .info-panel { grid-column: 1 / -1; }
+  .party-side { left: 4%; }
+  .enemy { right: 3%; transform: scale(.8); transform-origin: bottom right; }
+}
+@media(max-width: 640px) {
+  body { padding: 0 0 16px; }
+  .game-shell { width: 100%; min-height: 100dvh; grid-template-rows: 340px auto; }
+  .hud { grid-template-columns: minmax(0,1fr); padding: 12px; gap: 14px; }
+  .info-panel { grid-column: auto; }
+  .skills-panel { width: 100%; }
+  .skill-card { height: 140px; }
+  .skill-char { font-size: 52px; }
+  .battle-topbar { left: 12px; right: 12px; top: 12px; }
+  .chapter { font-size: 14px; }
+  .objective { font-size: 12px; }
+  .pause-button { padding: 7px; font-size: 12px; }
+  .enemy-panel { top: 64px; right: 12px; width: 156px; padding: 8px; }
+  .enemy-name { font-size: 16px; }
+  .party-side { left: 4%; bottom: 8%; width: 180px; height: 220px; transform: scale(.58); transform-origin: bottom left; }
+  .enemy { right: 0; bottom: 4%; transform: scale(.48); }
+  .preview-layer { left: 34%; right: 30%; top: 64%; }
+  .preview-label { font-size: 11px; max-width: 150px; top: 40px; padding: 4px; }
+  .preview-arrow { right: -12px; }
 }

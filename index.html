@@ -14,8 +14,9 @@
           <div>
             <span class="chapter">第一卷 · 雪林醒魂</span>
             <span class="objective">目标：击退霜藤妖</span>
+            <span id="turn-label" aria-live="polite">第 1 回合 · 我方行动</span>
           </div>
-          <button class="pause-button" type="button">暂停</button>
+          <button class="pause-button" type="button">暂停 / 菜单</button>
         </header>
 
         <aside class="enemy-panel" aria-label="敌方状态">
@@ -128,25 +129,25 @@
         </div>
 
         <div class="skills-panel" role="list" aria-label="汉字技能">
-          <button class="skill-card" type="button" data-skill="dao" role="listitem">
+          <button class="skill-card selected" type="button" data-skill="dao" role="listitem">
+            <span class="skill-char">一</span>
+            <span class="skill-name">一线破妖</span>
+          </button>
+          <button class="skill-card" type="button" data-skill="zhan" role="listitem">
             <span class="skill-char">刀</span>
             <span class="skill-name">墨刀</span>
           </button>
-          <button class="skill-card selected" type="button" data-skill="zhan" role="listitem">
-            <span class="skill-char">斩</span>
-            <span class="skill-name">一字斩</span>
-          </button>
           <button class="skill-card" type="button" data-skill="jing" role="listitem">
-            <span class="skill-char">静</span>
-            <span class="skill-name">静心</span>
+            <span class="skill-char">人</span>
+            <span class="skill-name">人心相扶</span>
           </button>
           <button class="skill-card" type="button" data-skill="ding" role="listitem">
-            <span class="skill-char">定</span>
-            <span class="skill-name">定身</span>
+            <span class="skill-char">止</span>
+            <span class="skill-name">止戈</span>
           </button>
         </div>
 
-        <div class="ink-dots" aria-label="当前墨点">
+        <div class="ink-dots" aria-label="当前墨点" hidden>
           <span class="filled"></span>
           <span class="filled"></span>
           <span></span>
@@ -157,22 +158,34 @@
 
         <aside class="info-panel" aria-live="polite">
           <div class="info-title">一字斩</div>
-          <p class="info-text">凝字为刃，对霜藤妖造成斩击伤害。克制藤蔓，命中后小幅击退行动条。</p>
+          <p class="info-text">凝字为刃，对霜藤妖造成斩击伤害，威力随书写契合度提升。</p>
           <div class="info-tags">
             <span>攻击</span>
             <span>克藤</span>
             <span>需书写</span>
           </div>
           <button class="cast-button" type="button">确认书写</button>
+          <button id="rest-button" type="button">调息 · 恢复20精神</button>
           <div class="combat-log">战斗记录：沈砚正在观望霜藤妖。</div>
-          <div class="save-actions" aria-label="存档操作">
-            <button class="save-button" type="button">保存进度</button>
-            <button class="load-button" type="button">读取存档</button>
-          </div>
-          <div class="save-status">存档：尚未操作</div>
         </aside>
       </section>
     </main>
+
+    <dialog id="writing-dialog" aria-labelledby="writing-title">
+      <form method="dialog"><button class="close-button" aria-label="取消书写">×</button></form>
+      <h2 id="writing-title">书写 · 斩</h2>
+      <div class="writing-meta"><span>我方回合 · 凝神书写</span><span id="writing-countdown" role="timer" aria-label="书写剩余时间">30秒</span></div>
+      <canvas id="writing-canvas" width="400" height="400" aria-label="汉字描写画布"></canvas>
+      <p id="writing-result" aria-live="polite">落笔凝字</p>
+      <div class="dialog-actions"><button id="clear-writing">重写</button><button id="submit-writing">落笔成招</button></div>
+    </dialog>
+    <dialog id="menu-dialog" aria-labelledby="menu-title">
+      <h2 id="menu-title">战斗暂停</h2>
+      <div class="dialog-actions"><button class="save-button">保存进度</button><button class="load-button">读取存档</button></div>
+      <p class="save-status" aria-live="polite">存档：尚未操作</p>
+      <button id="resume-battle">继续战斗</button>
+    </dialog>
+    <dialog id="result-dialog" aria-labelledby="result-title"><h2 id="result-title"></h2><p id="result-text"></p><button id="restart-battle">重新挑战</button></dialog>
 
     <script type="module" src="src/main.js"></script>
   </body>
