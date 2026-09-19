@@ -1,0 +1,27 @@
+.battlefield { min-height: 460px; }
+.party-side { inset: 0; width: 100%; height: 100%; transform: none; }
+.hero { left: 21%; bottom: 3%; width: 29%; height: 59%; z-index: 3; }
+.mentor { left: 3%; bottom: 8%; width: 22%; height: 55%; opacity: 1; z-index: 2; }
+.enemy { right: 5%; bottom: 3%; width: 31%; height: 55%; transform: none; }
+.character-art { display: block; position: relative; width: 100%; height: 100%; object-fit: contain; object-position: center bottom; user-select: none; pointer-events: none; transform-origin: center bottom; animation: characterBreath 5s ease-in-out infinite; }
+.mentor .character-art { animation-delay: -2s; }
+.enemy .character-art { animation-delay: -3s; }
+.hero::before, .mentor::before, .enemy::before { content: ''; position: absolute; bottom: 0; left: 23%; width: 54%; height: 9px; background: #17252238; border-radius: 50%; filter: blur(4px); }
+.mentor-bubble { top: 105px; bottom: auto; left: 27%; width: min(390px, 40%); }
+.portrait { overflow: hidden; position: relative; background: #dbe1d8; }
+.portrait img { position: absolute; width: 220%; height: 380%; max-width: none; object-fit: contain; left: -60%; top: -30%; }
+.portrait-mentor img { width: 200%; left: -50%; top: -15%; }
+.preview-layer { z-index: 4; pointer-events: none; }
+@keyframes characterBreath { 0%, 100% { transform: translateY(0) rotate(-0.3deg); } 50% { transform: translateY(-3px) rotate(0.3deg); } }
+@media (max-width: 640px) {
+  .game-shell { grid-template-rows: 500px auto; }
+  .battlefield { min-height: 500px; }
+  .party-side { inset: 0; width: 100%; height: 100%; transform: none; }
+  .mentor { left: 0; bottom: 6%; width: 30%; height: 39%; }
+  .hero { left: 17%; bottom: 2%; width: 43%; height: 43%; }
+  .enemy { right: 0; bottom: 4%; width: 43%; height: 47%; transform: none; }
+  .mentor-bubble { top: 183px; left: 12px; bottom: auto; width: calc(100% - 24px); }
+  .preview-layer { top: 64%; left: 43%; right: 24%; }
+  .preview-label { max-width: 130px; }
+}
+@media (prefers-reduced-motion: reduce) { .character-art { animation: none; } }

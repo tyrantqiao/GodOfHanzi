@@ -1,5 +1,6 @@
 import { loadLocalSave, loadServerSave, saveLocal, saveServer } from "./storage.js";
 import { scoreWriting } from './writing-score.js';
+import { speak, stopVoice } from './voice.js';
 
 const fallbackSkills = [
   {
@@ -46,6 +47,9 @@ const loadButton = document.querySelector(".load-button");
 const saveStatus = document.querySelector(".save-status");
 const combatLog = document.querySelector(".combat-log");
 const enemyPanel = document.querySelector(".enemy-panel");
+const mentorBubble = document.querySelector(".mentor-bubble");
+const mentorLine = mentorBubble?.querySelector("p");
+const writingGuide = document.querySelector(".writing-guide");
 
 let skillData = {};
 let battleState = null;
@@ -61,6 +65,20 @@ const restButton = document.querySelector('#rest-button');
 const writingDialog = document.querySelector('#writing-dialog');
 const menuDialog = document.querySelector('#menu-dialog');
 const resultDialog = document.querySelector('#result-dialog');
+
+const mentorSkillTips = {
+  dao: "先从「一」试起：选字牌后点开始书写，照着淡墨横线稳稳走完一笔。",
+  zhan: "「刀」是主攻字。笔画越贴近字形，斩击越重，专破霜藤妖的妖躯。",
+  jing: "「人」可温养自身。写得过半，回血之外还能净化寒蚀与恐惧。",
+  ding: "「止」能封住妖势。书写威力达到50%，霜藤妖就会跳过一次反击。",
+};
+
+const writingGuides = {
+  dao: "一横求稳不求快：贴着淡墨横线走，少抖、少偏、不要反复涂厚。",
+  zhan: "写「刀」时先顾字形，再顾速度。覆盖淡墨笔画，同时别把空白处涂满。",
+  jing: "写「人」要让两笔立住。贴合淡墨，空处留白，笔力才会回到自己身上。",
+  ding: "写「止」要收住笔势。威力过半即可定身，覆盖和准确越高越稳。",
+};
 
 async function loadJson(path, fallback) {
   try {
@@ -101,6 +119,22 @@ function setSaveStatus(message) {
 
 function setLog(message) {
   combatLog.textContent = `战斗记录：${message}`;
+}
+
+function setMentorTip(message, tone = 'guide', appendVoice = false) {
+  if (!mentorBubble || !mentorLine) return;
+  mentorLine.textContent = message;
+  speak(message, 'mentor', { interrupt: !appendVoice, deduplicate: true });
+  mentorBubble.classList.remove('guide', 'praise', 'warn');
+  mentorBubble.classList.add(tone);
+  mentorBubble.style.animation = 'none';
+  void mentorBubble.offsetWidth;
+  mentorBubble.style.animation = '';
+}
+
+function setWritingGuide(skill) {
+  if (!writingGuide) return;
+  writingGuide.textContent = `${writingGuides[skill.id] || '沿淡墨字形下笔，尽量覆盖该覆盖的笔画，避开空白处。'} 覆盖率和准确率都达到90%，就会判定为完美书写。`;
 }
 
 function getActor(id = selectedCharacter) {
@@ -186,6 +220,9 @@ function showSkillInfo(skillId = selectedSkill) {
   previewLabel.textContent = skill.effect === 'damage' ? `预计伤害 ${skill.requiresWriting ? '0–' : ''}${calculateDamage(actor, skill)}` : skill.effect === 'control' ? '威力≥50% · 定身一回合' : `净化目标：${actor.name}`;
   previewLayer.classList.toggle("hidden", !skill.previewVisible);
   document.querySelector('.enemy').classList.toggle('targeted', skill.target === 'enemy' && !battleEnded);
+  if (battleState.turn.side === 'player' && !battleEnded && !writingDialog.open) {
+    setMentorTip(mentorSkillTips[skill.id] || "先看汉字牌的效果，再选择施法者。精神足够时，就可以开始书写。", 'guide', true);
+  }
 }
 
 function selectSkill(skillId) {
@@ -230,6 +267,8 @@ function applySkill(writingScore = null) {
     writingPending = { actorId: actor.id, skillId: selectedSkill };
     document.querySelector('#writing-title').textContent = `书写 · ${skill.char}`;
     resetWriting(skill.char);
+    setWritingGuide(skill);
+    setMentorTip("看淡墨底字落笔：覆盖该有的笔画，避开空白。覆盖与准确双过90%，便是完美。");
     writingDialog.showModal();
     startWritingTimer();
     return;
@@ -605,6 +644,7 @@ function finishWriting(reason) {
   writingDialog.close();
   if (!hasInk) {
     setLog('书写时间已到，尚未落笔，请重新选招。');
+    setMentorTip("未落笔不会消耗精神。下一次先稳住呼吸，再从淡墨最清楚的一笔开始。", 'warn');
     return;
   }
   const pixels = inkContext.getImageData(0, 0, 400, 400).data;
@@ -615,22 +655,37 @@ function finishWriting(reason) {
 }
 
 function showWritingFeedback(result, skill, actor) {
+  speak(skill.char, actor.id === 'shen_yan' ? 'hero' : 'mentor', { interrupt: true });
   const field = document.querySelector('.battlefield');
   field.scrollIntoView({ block: 'nearest', behavior: 'instant' });
   field.querySelectorAll('.writing-verdict, .enemy-taunt, .ink-burst').forEach(node => node.remove());
+  const coverage = Math.round(result.coverage * 100);
+  const precision = Math.round(result.precision * 100);
   const verdict = document.createElement('div');
   verdict.className = `writing-verdict ${result.tier}`;
   const title = document.createElement('strong');
   title.textContent = `${({ perfect: '神完气足', good: '笔力遒劲', normal: '初具字形', weak: '笔力微弱', flooded: '墨乱神散' })[result.tier]} · ${Math.round(result.score * 100)}分`;
   const detail = document.createElement('span');
-  detail.textContent = `覆盖 ${Math.round(result.coverage * 100)}% · 准确 ${Math.round(result.precision * 100)}% · 威力 ${Math.round(result.power * 100)}%`;
+  detail.textContent = `覆盖 ${coverage}% · 准确 ${precision}% · 威力 ${Math.round(result.power * 100)}%`;
   verdict.append(title, detail);
   field.append(verdict);
   setTimeout(() => verdict.remove(), 4200);
+  if (result.tier === 'perfect') {
+    setMentorTip(`好字！覆盖 ${coverage}%、准确 ${precision}%，双过90%，这一击便是完美书写。`, 'praise', true);
+  } else if (result.tier === 'flooded') {
+    setMentorTip(`墨铺得太满，空白也被吞了。宁可少写一分，也别把画布涂成一团。`, 'warn', true);
+  } else if (result.tier === 'weak') {
+    setMentorTip(`笔画偏得多了些。先追淡墨的骨架，覆盖上去，再谈速度。`, 'warn', true);
+  } else if (result.power >= .5) {
+    setMentorTip(`已能成招。想要完美，就让覆盖和准确同时到90%以上。`, 'guide', true);
+  } else {
+    setMentorTip(`字形已起，但笔力还浅。少写空白，多贴淡墨，威力会立刻上来。`, 'guide', true);
+  }
   if (['weak', 'flooded'].includes(result.tier)) {
     const taunt = document.createElement('div');
     taunt.className = 'enemy-taunt';
     taunt.textContent = result.tier === 'flooded' ? '走火入魔了吗' : '字都不会写了吗';
+    speak(taunt.textContent, 'enemy');
     field.append(taunt);
     setTimeout(() => taunt.remove(), 4200);
   }
@@ -659,6 +714,7 @@ document.addEventListener('visibilitychange', updateWritingTimer);
 document.querySelector('.pause-button').addEventListener('click', () => menuDialog.showModal());
 document.querySelector('#resume-battle').addEventListener('click', () => menuDialog.close());
 document.querySelector('#restart-battle').addEventListener('click', () => {
+  stopVoice();
   battleState = clone(initialBattle);
   selectedCharacter = battleState.party[0].id;
   battleEnded = false;
@@ -676,6 +732,7 @@ restButton.addEventListener('click', () => {
   const restored = Math.min(20, actor.maxSpirit - actor.spirit);
   actor.spirit += restored;
   setLog(`${actor.name} 调息，恢复 ${Math.floor(restored)} 点精神。`);
+  setMentorTip("调息也算一次行动。精神不足时可用，但要准备承受妖物反击。");
   beginEnemyTurn(actor.id);
   renderAll();
   showSkillInfo();

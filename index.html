@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>汉字成圣 - 对战界面原型</title>
     <link rel="stylesheet" href="src/styles.css" />
+    <link rel="stylesheet" href="src/characters.css" />
   </head>
   <body>
     <main class="game-shell" aria-label="汉字成圣对战界面原型">
@@ -40,20 +41,16 @@
         <div class="combatants">
           <div class="party-side">
             <div class="mentor sprite" aria-label="导师陆青崖">
-              <div class="mentor-head"></div>
-              <div class="mentor-body"></div>
-              <div class="mentor-staff"></div>
+              <img class="character-art" src="src/assets/characters/lu-qingya.png" alt="白发青袍、手持竹杖的陆青崖" draggable="false" />
             </div>
 
+            <aside class="mentor-bubble guide" aria-live="polite" aria-label="师父旁白">
+              <strong>陆青崖</strong>
+              <p>先选一枚汉字，再凝神书写。字形越准，术法越盛。</p>
+            </aside>
+
             <div class="hero sprite" aria-label="主角沈砚">
-              <div class="hero-head"></div>
-              <div class="hero-body"></div>
-              <div class="hero-arm left"></div>
-              <div class="hero-arm right"></div>
-              <div class="hero-leg left"></div>
-              <div class="hero-leg right"></div>
-              <div class="brush"></div>
-              <div class="scarf"></div>
+              <img class="character-art" src="src/assets/characters/shen-yan.png" alt="红巾青衣、执笔迎敌的沈砚" draggable="false" />
             </div>
           </div>
 
@@ -64,14 +61,7 @@
           </div>
 
           <div class="enemy frost-vine" aria-label="敌人霜藤妖">
-            <div class="vine-core"></div>
-            <div class="vine vine-a"></div>
-            <div class="vine vine-b"></div>
-            <div class="vine vine-c"></div>
-            <div class="vine vine-d"></div>
-            <div class="thorn thorn-a"></div>
-            <div class="thorn thorn-b"></div>
-            <div class="enemy-shadow"></div>
+            <img class="character-art" src="src/assets/characters/frost-vine.png" alt="冰晶缠枝、藤甲护心的霜藤妖" draggable="false" />
           </div>
         </div>
       </section>
@@ -80,7 +70,7 @@
         <div class="characters-panel">
           <article class="status-card active" data-character="shen_yan" tabindex="0">
             <div class="portrait portrait-hero">
-              <span>文</span>
+              <img src="src/assets/characters/shen-yan.png" alt="沈砚" />
             </div>
             <div class="status-content">
               <div class="character-line">
@@ -105,7 +95,7 @@
 
           <article class="status-card" data-character="lu_qingya" tabindex="0">
             <div class="portrait portrait-mentor">
-              <span>师</span>
+              <img src="src/assets/characters/lu-qingya.png" alt="陆青崖" />
             </div>
             <div class="status-content">
               <div class="character-line">
@@ -175,12 +165,20 @@
       <form method="dialog"><button class="close-button" aria-label="取消书写">×</button></form>
       <h2 id="writing-title">书写 · 斩</h2>
       <div class="writing-meta"><span>我方回合 · 凝神书写</span><span id="writing-countdown" role="timer" aria-label="书写剩余时间">30秒</span></div>
+      <p class="writing-guide" aria-live="polite">沿淡墨字形下笔。覆盖和准确都达到90%，就是完美书写。</p>
       <canvas id="writing-canvas" width="400" height="400" aria-label="汉字描写画布"></canvas>
       <p id="writing-result" aria-live="polite">落笔凝字</p>
       <div class="dialog-actions"><button id="clear-writing">重写</button><button id="submit-writing">落笔成招</button></div>
     </dialog>
     <dialog id="menu-dialog" aria-labelledby="menu-title">
       <h2 id="menu-title">战斗暂停</h2>
+      <div class="voice-settings">
+        <label><input id="voice-enabled" type="checkbox" checked /> 角色语音</label>
+        <label for="voice-volume">语音音量</label>
+        <input id="voice-volume" type="range" min="0" max="1" step="0.05" value="0.8" />
+        <div class="dialog-actions"><button id="voice-preview" type="button">试听对白</button><button id="voice-stop" type="button">跳过语音</button></div>
+        <p id="voice-status" role="status">正在连接语音服务</p>
+      </div>
       <div class="dialog-actions"><button class="save-button">保存进度</button><button class="load-button">读取存档</button></div>
       <p class="save-status" aria-live="polite">存档：尚未操作</p>
       <button id="resume-battle">继续战斗</button>

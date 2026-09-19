@@ -3,9 +3,11 @@ import { readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { createVoiceService } from './voice-service.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = __dirname;
+const voiceService = createVoiceService(rootDir);
 const port = Number(process.env.PORT || 5173);
 const savePath = path.join(rootDir, "data", "save.local.json");
 const defaultSavePath = path.join(rootDir, "data", "default-save.json");
@@ -49,6 +51,20 @@ async function readRequestBody(req) {
 }
 
 async function handleApi(req, res, url) {
+  if (url.pathname === '/api/voice/status' && req.method === 'GET') {
+    send(res, 200, JSON.stringify(voiceService.status()), 'application/json; charset=utf-8');
+    return true;
+  }
+  if (url.pathname === '/api/voice' && req.method === 'POST') {
+    try {
+      const { text, role } = JSON.parse(await readRequestBody(req));
+      const audio = await voiceService.generate(text, role);
+      send(res, 200, audio, 'audio/wav');
+    } catch (error) {
+      send(res, error instanceof SyntaxError ? 400 : error.status || 500, JSON.stringify({ error: error.message }), 'application/json; charset=utf-8');
+    }
+    return true;
+  }
   if (url.pathname === "/api/save" && req.method === "GET") {
     const target = existsSync(savePath) ? savePath : defaultSavePath;
     const save = await readJsonFile(target);
@@ -75,7 +91,10 @@ async function serveStatic(req, res, url) {
   const requestedPath = decodeURIComponent(url.pathname === "/" ? "/index.html" : url.pathname);
   const absolutePath = path.resolve(rootDir, `.${requestedPath}`);
 
-  if (!absolutePath.startsWith(rootDir)) {
+  const relative = path.relative(rootDir, absolutePath);
+  if (relative.startsWith('..') || path.isAbsolute(relative) ||
+      /^(models|node_modules|\.git|data[\\/]voice-cache)([\\/]|$)/i.test(relative) ||
+      /^(server|voice-worker|voice-service)\.js$/i.test(relative)) {
     send(res, 403, "Forbidden");
     return;
   }

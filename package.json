@@ -5,6 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "node server.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "voice:warm": "node scripts/warm-voices.js",
+    "test": "node --test src/writing-score.test.js voice-service.test.js"
+  },
+  "dependencies": {
+    "sherpa-onnx-node": "^1.13.8"
   }
 }
