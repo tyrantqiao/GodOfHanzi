@@ -4,6 +4,13 @@ import { existsSync } from 'node:fs';
 import { mkdir, readFile, rename, unlink } from 'node:fs/promises';
 import path from 'node:path';
 
+const CACHE_VERSION = 'kokoro-v1.1-zh-v2';
+const VOICES = {
+  hero: { sid: 58, speed: 1 },
+  mentor: { sid: 65, speed: 1.14 },
+  enemy: { sid: 78, speed: 0.95 },
+};
+
 export function normalizeSpeechText(text) {
   const digits = '零一二三四五六七八九';
   const number = value => {
@@ -15,13 +22,20 @@ export function normalizeSpeechText(text) {
   };
   return text.replace(/(\d+)(?:\.(\d+))?%/g, (_, whole, fraction) =>
     `百分之${number(whole)}${fraction ? `点${[...fraction].map(d => digits[Number(d)]).join('')}` : ''}`
-  ).replace(/[「」]/g, '');
+  )
+    .replace(/[「」『』“”《》]/g, '')
+    .replace(/、/g, '，')
+    .replace(/[：:；;]/g, '，')
+    .replace(/[、，]{2,}/g, '，')
+    .replace(/[…。！？!?]{2,}/g, '。')
+    .replace(/[^\p{Script=Han}\p{Script=Latin}\p{Number}\s，。？！,.!?]/gu, '')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 export function createVoiceService(root) {
   const modelDir = path.resolve(process.env.TTS_MODEL_DIR || path.join(root, 'models/kokoro-multi-lang-v1_1'));
   const cacheDir = path.join(root, 'data/voice-cache');
-  const voices = { hero: { sid: 58, speed: 1 }, mentor: { sid: 65, speed: 0.95 }, enemy: { sid: 78, speed: 0.9 } };
   const pending = new Map();
   let worker;
   let ready = false;
@@ -49,12 +63,12 @@ export function createVoiceService(root) {
     close: () => worker?.terminate(),
     status: () => ({ ready, message: error, engine: 'Kokoro Chinese / CPU' }),
     async generate(text, role) {
-      if (typeof text !== 'string' || !text.trim() || text.length > 220 || !Object.hasOwn(voices, role)) {
+      if (typeof text !== 'string' || !text.trim() || text.length > 220 || !Object.hasOwn(VOICES, role)) {
         throw Object.assign(new Error('无效的台词或角色'), { status: 400 });
       }
-      const voice = voices[role];
+      const voice = VOICES[role];
       text = normalizeSpeechText(text);
-      const id = createHash('sha256').update(JSON.stringify(['kokoro-v1.1-zh-v1', text, voice])).digest('hex');
+      const id = createHash('sha256').update(JSON.stringify([CACHE_VERSION, text, voice])).digest('hex');
       const output = path.join(cacheDir, `${id}.wav`);
       if (existsSync(output)) return readFile(output);
       if (!ready) throw Object.assign(new Error(error), { status: 503 });

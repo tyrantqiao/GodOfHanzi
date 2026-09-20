@@ -4,6 +4,7 @@ const status = document.querySelector('#voice-status');
 let context;
 let source;
 let gain;
+let voiceGraph;
 let generation = 0;
 let queue = Promise.resolve();
 let enabled = toggle.checked;
@@ -12,7 +13,32 @@ const recentLines = new Map();
 
 function unlock() {
   context ||= new AudioContext();
-  if (!gain) { gain = context.createGain(); gain.connect(context.destination); }
+  if (!gain) {
+    const highpass = context.createBiquadFilter();
+    highpass.type = 'highpass';
+    highpass.frequency.value = 90;
+    highpass.Q.value = 0.7;
+
+    const presence = context.createBiquadFilter();
+    presence.type = 'peaking';
+    presence.frequency.value = 2800;
+    presence.Q.value = 0.9;
+    presence.gain.value = 2.5;
+
+    const compressor = context.createDynamicsCompressor();
+    compressor.threshold.value = -24;
+    compressor.knee.value = 18;
+    compressor.ratio.value = 3;
+    compressor.attack.value = 0.003;
+    compressor.release.value = 0.18;
+
+    gain = context.createGain();
+    highpass.connect(presence);
+    presence.connect(compressor);
+    compressor.connect(gain);
+    gain.connect(context.destination);
+    voiceGraph = { highpass, presence };
+  }
   gain.gain.value = Number(volume.value);
   void context.resume();
 }
@@ -56,7 +82,12 @@ export function speak(text, role = 'mentor', { interrupt = false, deduplicate = 
     if (current !== generation || !enabled) return;
     const playing = context.createBufferSource();
     playing.buffer = buffer;
-    playing.connect(gain);
+    if (voiceGraph) {
+      voiceGraph.presence.gain.value = role === 'mentor' ? 3.5 : 2.5;
+      playing.connect(voiceGraph.highpass);
+    } else {
+      playing.connect(gain);
+    }
     source = playing;
     status.textContent = `${({ mentor: '陆青崖', hero: '沈砚', enemy: '霜藤妖' })[role]}正在说话`;
     await new Promise(resolve => { playing.onended = resolve; playing.start(); });

@@ -6,8 +6,10 @@ import path from 'node:path';
 import { createVoiceService, normalizeSpeechText } from './voice-service.js';
 
 test('teaching percentages are spoken as Chinese numbers', () => {
-  assert.equal(normalizeSpeechText('「一」覆盖90%、准确100%、威力50%。'), '一覆盖百分之九十、准确百分之一百、威力百分之五十。');
+  assert.equal(normalizeSpeechText('「一」覆盖90%、准确100%、威力50%。'), '一覆盖百分之九十，准确百分之一百，威力百分之五十。');
   assert.equal(normalizeSpeechText('0% 10% 11% 9.5%'), '百分之零 百分之十 百分之十一 百分之九点五');
+  assert.equal(normalizeSpeechText('先从「一」试起：选字牌后点开始书写。'), '先从一试起，选字牌后点开始书写。');
+  assert.equal(normalizeSpeechText('覆盖与准确双过90%！！便是完美。'), '覆盖与准确双过百分之九十。便是完美。');
 });
 
 test('missing or partial models degrade gracefully and invalid requests are rejected', async () => {

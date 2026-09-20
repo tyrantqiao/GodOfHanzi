@@ -527,18 +527,40 @@ const inkContext = ink.getContext('2d', { willReadFrequently: true });
 let drawing = false;
 let hasInk = false;
 let templateMask;
-let previousPoint;
+let brushStrokes = [];
+let activeStroke = null;
+let brushFrame = null;
 let activePointer = null;
 let writingDeadline = 0;
 let writingTimer = null;
 const countdown = document.querySelector('#writing-countdown');
+const BRUSH_MIN_WIDTH = 7;
+const BRUSH_MAX_WIDTH = 28;
+const BRUSH_BLOOM_DELAY = 180;
+const BRUSH_BLOOM_DURATION = 1100;
 
 function stopWriting() {
   clearInterval(writingTimer);
   writingTimer = null;
+  finishActiveStroke();
   drawing = false;
+  stopBrushBloom();
   if (activePointer !== null && canvas.hasPointerCapture(activePointer)) canvas.releasePointerCapture(activePointer);
   activePointer = null;
+}
+
+function stopBrushBloom() {
+  if (brushFrame !== null) cancelAnimationFrame(brushFrame);
+  brushFrame = null;
+}
+
+function finishActiveStroke() {
+  if (!activeStroke) return;
+  activeStroke.complete = activeStroke.points.length > 1;
+  const tip = activeStroke.points.at(-1);
+  tip.pressure = clamp(tip.pressure + activeStroke.hold * 0.16, 0, 1);
+  activeStroke = null;
+  renderInk();
 }
 
 function updateWritingTimer() {
@@ -572,9 +594,173 @@ function drawWriting() {
   context.drawImage(ink, 0, 0);
 }
 
+function markInk() {
+  hasInk = true;
+  document.querySelector('#submit-writing').disabled = false;
+}
+
+function turnAmount(a, b) {
+  if (!a || !b) return 0;
+  const dot = clamp(a.x * b.x + a.y * b.y, -1, 1);
+  return Math.acos(dot) / Math.PI;
+}
+
+function makeStroke(start, time, pressure) {
+  return {
+    points: [{ ...start, time, pressure, velocity: 0.45, turn: 0, length: 0 }],
+    rawPoint: start,
+    direction: null,
+    holdStartedAt: time,
+    hold: 0,
+    renderedHold: -1,
+    complete: false,
+  };
+}
+
+function addStrokePoint(stroke, rawPoint, time, inputPressure = null) {
+  const last = stroke.points.at(-1);
+  const rawDistance = Math.hypot(rawPoint.x - stroke.rawPoint.x, rawPoint.y - stroke.rawPoint.y);
+  stroke.rawPoint = rawPoint;
+  if (rawDistance < 0.65) return false;
+
+  const streamline = clamp(0.3 + rawDistance / 45, 0.3, 0.56);
+  const next = {
+    x: last.x + (rawPoint.x - last.x) * streamline,
+    y: last.y + (rawPoint.y - last.y) * streamline,
+  };
+  const dx = next.x - last.x;
+  const dy = next.y - last.y;
+  const distance = Math.hypot(dx, dy);
+  if (distance < 0.35) return false;
+
+  const direction = { x: dx / distance, y: dy / distance };
+  const turn = turnAmount(stroke.direction, direction);
+  const instantVelocity = distance / Math.max(4, time - last.time);
+  const velocity = last.velocity * 0.72 + instantVelocity * 0.28;
+  const simulated = 0.22 + clamp(1 - velocity / 1.15, 0, 1) * 0.68;
+  const targetPressure = inputPressure === null ? simulated : clamp(inputPressure, 0.08, 1);
+  const cornerPressure = clamp((turn - 0.08) / 0.34, 0, 1) * 0.12;
+  const pressure = clamp(last.pressure * 0.64 + targetPressure * 0.36 + cornerPressure, 0.08, 1);
+
+  stroke.points.push({
+    ...next,
+    time,
+    pressure,
+    velocity,
+    turn,
+    length: last.length + distance,
+  });
+  stroke.direction = direction;
+  stroke.holdStartedAt = time;
+  stroke.hold = 0;
+  return true;
+}
+
+function pointRadius(stroke, index) {
+  const point = stroke.points[index];
+  let radius = (BRUSH_MIN_WIDTH + (BRUSH_MAX_WIDTH - BRUSH_MIN_WIDTH) * point.pressure) / 2;
+  const startTaper = clamp((point.length + 3) / 13, 0.24, 1);
+  radius *= startTaper;
+
+  if (point.turn > 0.14) radius *= 1 + Math.min(point.turn, 0.55) * 0.18;
+  if (!stroke.complete && index === stroke.points.length - 1) radius += stroke.hold * 7;
+  if (stroke.complete) {
+    const total = stroke.points.at(-1).length;
+    const remaining = total - point.length;
+    radius *= clamp((remaining + 1.2) / 12, 0.1, 1);
+  }
+  return Math.max(0.8, radius);
+}
+
+function strokeOutline(stroke) {
+  if (stroke.points.length < 2) return null;
+  const left = [];
+  const right = [];
+  for (let index = 0; index < stroke.points.length; index++) {
+    const point = stroke.points[index];
+    const before = stroke.points[Math.max(0, index - 1)];
+    const after = stroke.points[Math.min(stroke.points.length - 1, index + 1)];
+    const dx = after.x - before.x;
+    const dy = after.y - before.y;
+    const length = Math.hypot(dx, dy) || 1;
+    const radius = pointRadius(stroke, index);
+    const nx = -dy / length;
+    const ny = dx / length;
+    left.push({ x: point.x + nx * radius, y: point.y + ny * radius, turn: point.turn });
+    right.push({ x: point.x - nx * radius, y: point.y - ny * radius, turn: point.turn });
+  }
+  return { left, right };
+}
+
+function traceBrushSide(points) {
+  for (let index = 1; index < points.length - 1; index++) {
+    const point = points[index];
+    const next = points[index + 1];
+    if (point.turn > 0.18) inkContext.lineTo(point.x, point.y);
+    else inkContext.quadraticCurveTo(point.x, point.y, (point.x + next.x) / 2, (point.y + next.y) / 2);
+  }
+  const last = points.at(-1);
+  inkContext.lineTo(last.x, last.y);
+}
+
+function renderStroke(stroke) {
+  const outline = strokeOutline(stroke);
+  if (!outline) {
+    const point = stroke.points[0];
+    const radius = pointRadius(stroke, 0) + stroke.hold * 5;
+    inkContext.beginPath();
+    inkContext.arc(point.x, point.y, radius, 0, Math.PI * 2);
+    inkContext.fill();
+    return;
+  }
+
+  inkContext.beginPath();
+  inkContext.moveTo(outline.left[0].x, outline.left[0].y);
+  traceBrushSide(outline.left);
+  const returningSide = [...outline.right].reverse();
+  inkContext.lineTo(returningSide[0].x, returningSide[0].y);
+  traceBrushSide(returningSide);
+  inkContext.closePath();
+  inkContext.fill();
+}
+
+function renderInk() {
+  inkContext.clearRect(0, 0, 400, 400);
+  inkContext.save();
+  inkContext.fillStyle = '#161b19';
+  inkContext.globalAlpha = 0.9;
+  brushStrokes.forEach(renderStroke);
+  inkContext.restore();
+  if (brushStrokes.length) markInk();
+  drawWriting();
+}
+
+function bloomBrush(now) {
+  if (!drawing || !activeStroke) return;
+  if (Date.now() >= writingDeadline) { finishWriting('timeout'); return; }
+  const held = Math.max(0, now - activeStroke.holdStartedAt - BRUSH_BLOOM_DELAY);
+  const progress = clamp(held / BRUSH_BLOOM_DURATION, 0, 1);
+  activeStroke.hold = 1 - (1 - progress) ** 2;
+  if (activeStroke.hold - activeStroke.renderedHold >= 0.025) {
+    activeStroke.renderedHold = activeStroke.hold;
+    renderInk();
+  }
+  brushFrame = requestAnimationFrame(bloomBrush);
+}
+
+function startBrush() {
+  stopBrushBloom();
+  brushFrame = requestAnimationFrame(bloomBrush);
+}
+
 function resetWriting(char) {
   drawing = false;
   hasInk = false;
+  brushStrokes = [];
+  activeStroke = null;
+  stopBrushBloom();
+  if (activePointer !== null && canvas.hasPointerCapture(activePointer)) canvas.releasePointerCapture(activePointer);
+  activePointer = null;
   templateContext.clearRect(0, 0, 400, 400);
   templateContext.fillStyle = '#171714';
   templateContext.font = '300px KaiTi, STKaiti, SimSun, serif';
@@ -608,32 +794,44 @@ canvas.addEventListener('pointerdown', event => {
   activePointer = event.pointerId;
   canvas.setPointerCapture(event.pointerId);
   drawing = true;
-  previousPoint = point(event);
+  const start = point(event);
+  const pressure = event.pointerType === 'pen' ? event.pressure : 0.4;
+  activeStroke = makeStroke(start, event.timeStamp || performance.now(), pressure);
+  brushStrokes.push(activeStroke);
+  markInk();
+  renderInk();
+  startBrush();
 });
 function continueStroke(event) {
   if (!drawing || event.pointerId !== activePointer) return;
   if (Date.now() >= writingDeadline) { finishWriting('timeout'); return; }
+  const samples = event.getCoalescedEvents?.() || [event];
+  let changed = false;
+  for (const sample of samples) {
+    const pressure = sample.pointerType === 'pen' ? sample.pressure : null;
+    changed = addStrokePoint(activeStroke, point(sample), sample.timeStamp || performance.now(), pressure) || changed;
+  }
+  if (changed) renderInk();
   const next = point(event);
-  inkContext.strokeStyle = '#161b19';
-  inkContext.lineWidth = 14;
-  inkContext.lineCap = 'round';
-  inkContext.beginPath();
-  inkContext.moveTo(previousPoint.x, previousPoint.y);
-  inkContext.lineTo(next.x, next.y);
-  inkContext.stroke();
-  previousPoint = next;
-  hasInk = true;
-  document.querySelector('#submit-writing').disabled = false;
-  drawWriting();
   if (next.x < 0 || next.x > 400 || next.y < 0 || next.y > 400) finishWriting('edge');
 }
 canvas.addEventListener('pointermove', continueStroke);
 canvas.addEventListener('pointerup', event => {
   continueStroke(event);
-  if (event.pointerId === activePointer) { drawing = false; activePointer = null; }
+  if (event.pointerId === activePointer) {
+    finishActiveStroke();
+    drawing = false;
+    stopBrushBloom();
+    activePointer = null;
+  }
 });
 for (const name of ['pointercancel', 'lostpointercapture']) canvas.addEventListener(name, event => {
-  if (event.pointerId === activePointer) { drawing = false; activePointer = null; }
+  if (event.pointerId === activePointer) {
+    finishActiveStroke();
+    drawing = false;
+    stopBrushBloom();
+    activePointer = null;
+  }
 });
 document.querySelector('#clear-writing').addEventListener('click', () => resetWriting(skillData[writingPending.skillId].char));
 function finishWriting(reason) {
