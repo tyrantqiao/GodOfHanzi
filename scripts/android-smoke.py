@@ -23,8 +23,10 @@ def dump():
     return ET.fromstring(raw)
 
 def find(label):
-    for node in dump().iter('node'):
-        if label in (node.get('text', '') + node.get('content-desc', '')):
+    nodes = list(dump().iter('node'))
+    nodes.sort(key=lambda node: (node.get('text', '') + node.get('content-desc', '')).casefold() != label.casefold())
+    for node in nodes:
+        if label.casefold() in (node.get('text', '') + node.get('content-desc', '')).casefold():
             bounds = list(map(int, re.findall(r'\d+', node.get('bounds', ''))))
             if len(bounds) == 4 and bounds[2] > bounds[0] and bounds[3] > bounds[1]:
                 return bounds
@@ -76,7 +78,14 @@ try:
         wait('新版本已下载', seconds=240)
         click('安装更新')
         time.sleep(3)
-        click('Install')
+        (out / 'installer-window.xml').write_text(ET.tostring(dump(), encoding='unicode'), encoding='utf-8')
+        for label in ['Install', 'Update', '安装', '更新']:
+            bounds = find(label)
+            if bounds:
+                adb('shell', 'input', 'tap', str((bounds[0]+bounds[2])//2), str((bounds[1]+bounds[3])//2))
+                break
+        else:
+            raise AssertionError('未找到系统安装确认按钮')
         deadline = time.time() + 60
         while time.time() < deadline:
             expected = json.loads(Path('smoke-apk/android-update.json').read_text())['versionCode']
@@ -95,5 +104,6 @@ finally:
     subprocess.run(['adb', 'shell', 'screencap', '-p', '/sdcard/smoke.png'], check=False)
     subprocess.run(['adb', 'pull', '/sdcard/smoke.png', str(out / 'screen.png')], check=False)
     (out / 'logcat.txt').write_text(adb('logcat', '-d', '-t', '1000'), encoding='utf-8')
+
 
 
