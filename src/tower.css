@@ -236,3 +236,25 @@ body[data-phase="route"] .hero{opacity:.85}
 #piles{white-space:normal;width:100%}.round-label{display:block;color:#d6c69f;margin-bottom:5px}.pile-counts{display:block;color:#b7cbc7;margin-top:5px;font-size:10px}
 #piles .combat-stats{gap:6px}#piles .combat-stat{font-size:11px;gap:2px}#piles .ui-icon{width:14px;height:14px}
 @media(orientation:landscape) and (max-height:450px){#enemy-status>strong{font-size:15px;margin-bottom:4px}.combat-stats{gap:8px}.combat-stat{font-size:11px}.combat-stat .ui-icon{width:15px;height:15px}}
+/* 宣纸与印章按钮，统一悬停、按下与键盘反馈。 */
+button:not(.card),.menu-actions a{border-radius:10px;transition:background .18s,box-shadow .18s,transform .18s;border-color:#8b927e66;box-shadow:inset 0 1px 0 #ffffff60,0 3px 8px #16313912}
+button:not(.card):not(:disabled):hover,.menu-actions a:hover{box-shadow:inset 0 1px 0 #ffffff80,0 5px 14px #16313926;filter:brightness(1.08)}
+button:not(.card):not(:disabled):active{transform:translateY(1px);box-shadow:inset 0 2px 4px #16313925}
+button:focus-visible,a:focus-visible{outline:2px solid #c59b52;outline-offset:3px}
+.home-actions button,.home-actions a{position:relative;border-radius:3px 14px 3px 14px;background:linear-gradient(110deg,#a4bfb21c,#f7f4ec06);border-left:3px solid #c0ac78;padding-right:38px}
+.home-actions button::after,.home-actions a::after{content:'›';position:absolute;right:18px;top:50%;transform:translateY(-50%);color:#d7bd85;font:24px serif}
+.home-actions #home-start{background:linear-gradient(110deg,#a6493c,#7d352e);border-left-color:#efd1a4}
+.home-settings{position:absolute;right:28px;top:24px;width:42px;height:42px;padding:9px;background:#f7f4ec12;color:#e4d4b3;border:1px solid #c0ac7855!important;border-radius:50%!important}
+.home-settings svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linejoin:round}
+header .icon-button{box-shadow:none}header .icon-button[data-panel="settings-dialog"]:hover svg{transform:rotate(25deg)}header .icon-button svg{transition:transform .25s}
+#settings-dialog{width:min(600px,calc(100vw - 32px));border-radius:16px;border:1px solid #ac9976;background:linear-gradient(135deg,#faf4e7,#e8e2d5);box-shadow:0 24px 80px #071b2260}
+#settings-dialog .panel-heading{border-bottom:1px solid #8b927e35;padding-bottom:14px}
+.update-settings{display:flex;gap:20px;align-items:center;justify-content:space-between;padding:18px 0}
+.update-settings h3{font:22px KaiTi,serif;margin:0 0 6px}.update-settings p{font-size:12px;line-height:1.7;margin:0;color:#626b60}
+#check-update{flex-shrink:0;background:linear-gradient(135deg,#345a58,#203f44);color:#fff4dc;padding:12px 20px;border-color:#526e64}
+.settings-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px}.settings-actions button{text-align:left;padding:14px;border-left:3px solid #a6493c;background:#fffaf080;font:20px KaiTi,serif}
+.settings-actions span{display:block;font:11px 'Microsoft YaHei',sans-serif;color:#6f7569;margin-top:7px}
+.menu-actions button,.menu-actions a{background:linear-gradient(135deg,#fffaf0,#e9e0ce);padding:12px;border-left:3px solid #768c7d}
+#end,#card-play,#craft-submit,#picker-confirm{background:linear-gradient(135deg,#a6493c,#78372e);color:#fff3de;border-color:#c58b6e}
+@media(max-height:400px){.home-settings{top:12px;right:18px;width:36px;height:36px}.update-settings{padding:12px 0}#settings-dialog .panel-heading{padding-bottom:8px}.settings-actions button{padding:10px}}
+@media(prefers-reduced-motion:reduce){button,header .icon-button svg{transition:none!important}}

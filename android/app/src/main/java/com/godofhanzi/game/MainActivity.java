@@ -25,12 +25,14 @@ import java.util.concurrent.*;
 
 public class MainActivity extends Activity {
     private static final String ORIGIN = "appassets.androidplatform.net";
-    private static final String REPO = "https://api.github.com/repos/tyrantqiao/GodOfHanzi/releases/latest";
+    private static final String RELEASE = "https://github.com/tyrantqiao/GodOfHanzi/releases/latest/download/";
     private final ExecutorService worker = Executors.newSingleThreadExecutor();
     private WebView web;
     private File pendingApk;
     private boolean waitingPermission;
-    private boolean alive = true;
+    private volatile boolean alive = true;
+    private final java.util.concurrent.atomic.AtomicBoolean checkingUpdate = new java.util.concurrent.atomic.AtomicBoolean();
+    private String updateMessage = "安卓安装版支持在线检测更新。";
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
@@ -77,12 +79,16 @@ public class MainActivity extends Activity {
                 WebResourceResponse response = loader.shouldInterceptRequest(uri);
                 return response != null ? response : new WebResourceResponse("text/plain", "UTF-8", 404, "Not Found", Collections.emptyMap(), new ByteArrayInputStream(new byte[0]));
             }
+            @Override public void onPageFinished(WebView view, String url) { updateStatus(updateMessage, checkingUpdate.get()); }
             @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 return !"https".equals(request.getUrl().getScheme()) || !ORIGIN.equals(request.getUrl().getHost());
             }
         });
+        web.addJavascriptInterface(new Object() {
+            @JavascriptInterface public void checkUpdate() { requestUpdate(); }
+        }, "HanziAndroid");
         web.loadUrl("https://" + ORIGIN + "/index.html");
-        worker.execute(this::checkUpdate);
+        requestUpdate();
     }
 
     private void ui(Runnable action) { runOnUiThread(() -> { if (alive && !isFinishing()) action.run(); }); }
@@ -96,19 +102,42 @@ public class MainActivity extends Activity {
         if (focused) enterImmersiveMode();
     }
     private void notice(String text) { ui(() -> Toast.makeText(this, text, Toast.LENGTH_LONG).show()); }
+    private void updateStatus(String message, boolean busy) {
+        ui(() -> {
+            updateMessage = message;
+            web.evaluateJavascript("window.dispatchEvent(new CustomEvent('hanzi-update',{detail:{message:"
+                + JSONObject.quote(message) + ",busy:" + busy + "}}))", null);
+        });
+    }
+    private void requestUpdate() {
+        if (!alive || !checkingUpdate.compareAndSet(false, true)) return;
+        updateStatus("正在检测新版本……", true);
+        worker.execute(this::checkUpdate);
+    }
     private HttpURLConnection connection(String url) throws Exception {
-        URI uri = URI.create(url);
-        String host = uri.getHost();
-        if (!"https".equals(uri.getScheme()) || host == null || !(host.equals("api.github.com") || host.equals("github.com") || host.endsWith(".githubusercontent.com"))) throw new IOException("更新地址无效");
-        HttpURLConnection conn = (HttpURLConnection) uri.toURL().openConnection();
-        conn.setConnectTimeout(15000); conn.setReadTimeout(30000);
-        conn.setRequestProperty("User-Agent", "GodOfHanzi-Android");
-        return conn;
+        // 发布资产会跳转到下载域名；每次跳转均验证 HTTPS 与来源。
+        for (int redirects = 0; redirects < 6; redirects++) {
+            URI uri = URI.create(url);
+            String host = uri.getHost();
+            if (!"https".equals(uri.getScheme()) || host == null || !(host.equals("github.com") || host.endsWith(".githubusercontent.com"))) throw new IOException("更新地址无效");
+            HttpURLConnection conn = (HttpURLConnection) uri.toURL().openConnection();
+            conn.setInstanceFollowRedirects(false);
+            conn.setConnectTimeout(15000); conn.setReadTimeout(30000);
+            conn.setRequestProperty("User-Agent", "GodOfHanzi-Android");
+            int status = conn.getResponseCode();
+            if (status == 301 || status == 302 || status == 303 || status == 307 || status == 308) {
+                String location = conn.getHeaderField("Location"); conn.disconnect();
+                if (location == null) throw new IOException("更新跳转地址缺失");
+                url = uri.resolve(location).toString(); continue;
+            }
+            return conn;
+        }
+        throw new IOException("更新跳转次数过多");
     }
     private byte[] read(String url, int limit) throws Exception {
         HttpURLConnection conn = connection(url);
         try {
-            if (conn.getResponseCode() != 200) throw new IOException("更新服务暂不可用");
+            if (conn.getResponseCode() != 200) throw new IOException("更新服务返回 HTTP " + conn.getResponseCode());
             try (InputStream input = conn.getInputStream(); ByteArrayOutputStream output = new ByteArrayOutputStream()) {
                 byte[] buffer = new byte[8192]; int count;
                 while ((count = input.read(buffer)) != -1) { if (output.size() + count > limit) throw new IOException("更新信息过大"); output.write(buffer, 0, count); }
@@ -116,25 +145,18 @@ public class MainActivity extends Activity {
             }
         } finally { conn.disconnect(); }
     }
-    private String asset(JSONArray assets, String name) throws Exception {
-        for (int i = 0; i < assets.length(); i++) { JSONObject a = assets.getJSONObject(i); if (name.equals(a.getString("name"))) return a.getString("browser_download_url"); }
-        throw new IOException("缺少安卓更新文件");
-    }
     private void checkUpdate() {
         try {
-            JSONObject release = new JSONObject(new String(read(REPO, 1024 * 1024), "UTF-8"));
-            if (release.optBoolean("draft") || release.optBoolean("prerelease")) return;
-            JSONArray assets = release.getJSONArray("assets");
-            JSONObject manifest = new JSONObject(new String(read(asset(assets, "android-update.json"), 16384), "UTF-8"));
+            JSONObject manifest = new JSONObject(new String(read(RELEASE + "android-update.json", 16384), "UTF-8"));
             long installed = getPackageManager().getPackageInfo(getPackageName(), 0).getLongVersionCode();
             long code = manifest.getLong("versionCode");
-            if (code <= installed) return;
+            if (code <= installed) { updateStatus("已是最新版本 " + getPackageManager().getPackageInfo(getPackageName(), 0).versionName, false); return; }
             String hash = manifest.getString("sha256");
             if (!hash.matches("[0-9a-f]{64}")) throw new IOException("校验信息无效");
-            notice("发现新版本 " + manifest.getString("versionName") + "，正在后台下载");
+            updateStatus("发现新版本 " + manifest.getString("versionName") + "，正在后台下载……", true);
             File dir = new File(getCacheDir(), "updates"); if (!dir.exists() && !dir.mkdirs()) throw new IOException("无法创建更新目录");
             File temporary = new File(dir, "update.part");
-            HttpURLConnection conn = connection(asset(assets, "GodOfHanzi.apk"));
+            HttpURLConnection conn = connection(RELEASE + "GodOfHanzi.apk");
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             try {
                 if (conn.getResponseCode() != 200) throw new IOException("下载失败");
@@ -153,11 +175,14 @@ public class MainActivity extends Activity {
             }
             File apk = new File(dir, "update.apk"); if (apk.exists() && !apk.delete()) throw new IOException("无法替换旧更新包");
             if (!temporary.renameTo(apk)) throw new IOException("无法保存更新包");
+            updateStatus("新版本已下载，安装前请保存试炼进度。", false);
             ui(() -> { pendingApk = apk; new AlertDialog.Builder(this).setTitle("新版本已下载")
                 .setMessage("安装更新将关闭游戏。请先使用游戏内“保存”按钮保存进度，覆盖安装会保留存档。")
                 .setPositiveButton("安装更新", (dialog, which) -> installUpdate())
                 .setNegativeButton("稍后", null).show(); });
-        } catch (Exception error) { notice("未能完成更新检查，可继续离线游玩；下次启动重试"); }
+        } catch (Exception error) {
+            updateStatus("检测更新失败：" + (error instanceof IOException ? error.getMessage() : "更新信息无法解析或验证") + "。请检查网络后重试。", false);
+        } finally { checkingUpdate.set(false); }
     }
     private void installUpdate() {
         if (pendingApk == null) return;

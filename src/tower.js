@@ -9,6 +9,7 @@ $('header').insertBefore($('#run-stats'), $('header nav'));
 const panelHints = {
   'collection-dialog': ['牌册', '查看本局字卡、强化情况与卡牌效果。'],
   'combo-dialog': ['凝式', '查看当前字印，组合术式或释放已凝成的术式。'],
+  'settings-dialog': ['设置', '检测版本更新、管理试炼或返回主菜单。'],
   'menu-dialog': ['试炼菜单', '保存、继续存档、查阅图鉴，或返回主菜单。'],
   'event-book-dialog': ['奇遇手册', '查看奇遇人物与故事类型。'],
   'atlas-dialog': ['术式图鉴', '查看全部组合配方、效果与已发现的术式。'],
@@ -54,6 +55,23 @@ function showHome() {
   $('#home-resume').focus();
 }
 $('#home-open').onclick = showHome;
+$('#settings-home').onclick = showHome;
+function refreshSettings() {
+  $('#settings-home').hidden = !runStarted || $('#game').hidden;
+  $('#settings-tools').hidden = !runStarted || $('#game').hidden;
+}
+window.addEventListener('hanzi-update', event => {
+  $('#update-status').textContent = event.detail.message;
+  $('#check-update').disabled = event.detail.busy;
+});
+$('#check-update').onclick = () => {
+  if (!window.HanziAndroid?.checkUpdate) {
+    $('#update-status').textContent = '当前为网页版本；检测与安装更新请在安卓安装版中使用。'; return;
+  }
+  $('#check-update').disabled = true; $('#update-status').textContent = '正在检测新版本……';
+  try { window.HanziAndroid.checkUpdate(); }
+  catch { $('#check-update').disabled = false; $('#update-status').textContent = '无法启动更新检测，请稍后重试。'; }
+};
 $('#home-resume').onclick = enterGame;
 $('#home-start').onclick = () => {
   if (runStarted && !['won','lost'].includes(run.phase) && !confirm('放弃当前试炼并开启新一局？')) return;
@@ -70,6 +88,7 @@ for (const [selector, host] of [
 ]) $('#' + host).append($(selector));
 for (const trigger of document.querySelectorAll('[data-panel]')) trigger.onclick = () => {
   const parent = trigger.closest('dialog'); if (parent) parent.close();
+  if (trigger.dataset.panel === 'settings-dialog') refreshSettings();
   $('#' + trigger.dataset.panel).showModal();
 };
 for (const close of document.querySelectorAll('[data-close]')) close.onclick = () => close.closest('dialog').close();
