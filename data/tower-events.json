@@ -1,0 +1,1210 @@
+{
+  "version": 1,
+  "description": "古代人物诗意幻境、原创挽词与明确标识的小说彩蛋；全部对话为游戏架空创作，无近现代历史人物。",
+  "events": [
+    {
+      "id": "libai",
+      "name": "月下论诗",
+      "person": "李白",
+      "kind": "dialogue",
+      "scene": "月光落在酒盏里。李白邀你说一首别人的诗，或聊聊他的作品。这里是古人的诗意幻境，并非史实对话。",
+      "art": "src/assets/tower/events/dialogue.svg",
+      "choices": [
+        {
+          "label": "讲王维《山居秋暝》：明月松间照，清泉石上流。",
+          "reply": "「好一幅清幽山水！你的字，也该有清风流水。」（架空对白）",
+          "effect": {
+            "type": "cards",
+            "keys": [
+              "wind",
+              "water",
+              "draw"
+            ],
+            "upgraded": false
+          }
+        },
+        {
+          "label": "赞《将进酒》里天生我材必有用的昂扬",
+          "reply": "「心中有气，落笔便有势。」（架空对白）",
+          "effect": {
+            "type": "cards",
+            "keys": [
+              "qi",
+              "gather",
+              "heavy"
+            ],
+            "upgraded": false
+          }
+        },
+        {
+          "label": "请他留下一笔，让我亲自临摹",
+          "reply": "他把笔递来：先试一个字，诗意会随笔锋显形。（架空对白）",
+          "effect": {
+            "type": "craft",
+            "keys": [
+              "fire",
+              "qi",
+              "wind"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "dufu",
+      "name": "茅屋秋灯",
+      "person": "杜甫",
+      "kind": "dialogue",
+      "scene": "秋风卷过屋角，诗人仍惦念着天下寒士。你准备如何回应？",
+      "art": "src/assets/tower/events/dialogue.svg",
+      "choices": [
+        {
+          "label": "谈《茅屋为秋风所破歌》里安得广厦千万间的愿望",
+          "reply": "灯火照向远处：护住他人，也能成为一种力量。（架空对白）",
+          "effect": {
+            "type": "cards",
+            "keys": [
+              "hold",
+              "guard",
+              "rock"
+            ],
+            "upgraded": false
+          }
+        },
+        {
+          "label": "讲李白《赠汪伦》的送别情",
+          "reply": "两种不同的心意，在纸上相遇。（架空对白）",
+          "effect": {
+            "type": "cards",
+            "keys": [
+              "water",
+              "draw",
+              "steady"
+            ],
+            "upgraded": false
+          }
+        },
+        {
+          "label": "替他补好窗纸，围炉休息",
+          "reply": "你们把漏风的角落补好，暖意恢复了精神。",
+          "effect": {
+            "type": "heal",
+            "amount": 18
+          }
+        }
+      ]
+    },
+    {
+      "id": "sushi",
+      "name": "东坡夜游",
+      "person": "苏轼",
+      "kind": "dialogue",
+      "scene": "江上月色正好。苏轼问：遇上风雨，下一笔该怎么落？",
+      "art": "src/assets/tower/events/dialogue.svg",
+      "choices": [
+        {
+          "label": "聊《定风波》：一蓑烟雨任平生",
+          "reply": "「那就从容些，稳稳写下去。」（架空对白）",
+          "effect": {
+            "type": "cards",
+            "keys": [
+              "steady",
+              "hold",
+              "water"
+            ],
+            "upgraded": false
+          }
+        },
+        {
+          "label": "讲陶渊明《饮酒》的采菊东篱下",
+          "reply": "「且把匆忙放一放。」（架空对白）",
+          "effect": {
+            "type": "craft",
+            "keys": [
+              "water",
+              "gather",
+              "qi"
+            ]
+          }
+        },
+        {
+          "label": "同看江月，调息片刻",
+          "reply": "月光不催人，你安静恢复体力。",
+          "effect": {
+            "type": "heal",
+            "amount": 16
+          }
+        }
+      ]
+    },
+    {
+      "id": "liqingzhao",
+      "name": "海棠帘下",
+      "person": "李清照",
+      "kind": "dialogue",
+      "scene": "一阵春雨后，帘旁留着未干的墨。她请你辨一辨诗词里的颜色。",
+      "art": "src/assets/tower/events/dialogue.svg",
+      "choices": [
+        {
+          "label": "说《如梦令》里绿肥红瘦的妙处",
+          "reply": "浓淡之间，有落笔的分寸。（架空对白）",
+          "effect": {
+            "type": "cards",
+            "keys": [
+              "guide",
+              "draw",
+              "exchange"
+            ],
+            "upgraded": false
+          }
+        },
+        {
+          "label": "把赞美写成一字小笺",
+          "reply": "她把空白纸笺推到你手边。（架空对白）",
+          "effect": {
+            "type": "craft",
+            "keys": [
+              "wind",
+              "water",
+              "fire"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "tao",
+      "name": "东篱晚照",
+      "person": "陶渊明",
+      "kind": "dialogue",
+      "scene": "篱边有菊，桌上有旧纸。他邀你放下赶路的念头。",
+      "art": "src/assets/tower/events/dialogue.svg",
+      "choices": [
+        {
+          "label": "聊结庐在人境，而无车马喧的心境",
+          "reply": "字册无需拥挤，留下最合意的几笔。（架空对白）",
+          "effect": {
+            "type": "remove"
+          }
+        },
+        {
+          "label": "取清泉磨墨，临一个水字",
+          "reply": "你听见溪水，也听见自己的笔锋。",
+          "effect": {
+            "type": "craft",
+            "keys": [
+              "water",
+              "qi",
+              "gather"
+            ]
+          }
+        },
+        {
+          "label": "歇脚看山",
+          "reply": "你把呼吸放慢。",
+          "effect": {
+            "type": "heal",
+            "amount": 18
+          }
+        }
+      ]
+    },
+    {
+      "id": "wangwei",
+      "name": "空山问墨",
+      "person": "王维",
+      "kind": "dialogue",
+      "scene": "竹影映在纸上。王维问你，想把山的静，还是风的动写进牌册？",
+      "art": "src/assets/tower/events/dialogue.svg",
+      "choices": [
+        {
+          "label": "山静，守而后发",
+          "reply": "山色入字，守势也可化为攻势。（架空对白）",
+          "effect": {
+            "type": "cards",
+            "keys": [
+              "guard",
+              "quake",
+              "stop"
+            ],
+            "upgraded": false
+          }
+        },
+        {
+          "label": "风动，借势成旋",
+          "reply": "竹影一动，风从笔端经过。（架空对白）",
+          "effect": {
+            "type": "cards",
+            "keys": [
+              "wind",
+              "spin",
+              "qi"
+            ],
+            "upgraded": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "poetry",
+      "name": "诗灯两问",
+      "person": "守灯童子",
+      "kind": "quiz",
+      "scene": "答两道诗词题。全对可选强化字卡，答对一题可选普通字卡；全错仍回复4生命。",
+      "art": "src/assets/tower/events/quiz.svg",
+      "questions": [
+        {
+          "prompt": "《将进酒》的作者是谁？",
+          "answers": [
+            "李白",
+            "杜甫",
+            "白居易"
+          ],
+          "correct": 0,
+          "explanation": "《将进酒》是李白的代表作。"
+        },
+        {
+          "prompt": "明月松间照的下一句是？",
+          "answers": [
+            "清泉石上流",
+            "低头思故乡",
+            "江清月近人"
+          ],
+          "correct": 0,
+          "explanation": "王维《山居秋暝》：明月松间照，清泉石上流。"
+        }
+      ],
+      "rewardKeys": [
+        "qi",
+        "wind",
+        "fire"
+      ],
+      "choices": []
+    },
+    {
+      "id": "moon",
+      "name": "江月诗关",
+      "person": "江边书生",
+      "kind": "quiz",
+      "scene": "两盏诗灯等待点亮。答案提交后会给解释，再进入下一题。",
+      "art": "src/assets/tower/events/quiz.svg",
+      "questions": [
+        {
+          "prompt": "《静夜思》中举头望明月的下一句是？",
+          "answers": [
+            "低头思故乡",
+            "举杯邀明月",
+            "对影成三人"
+          ],
+          "correct": 0,
+          "explanation": "《静夜思》：举头望明月，低头思故乡。"
+        },
+        {
+          "prompt": "《春晓》的作者是谁？",
+          "answers": [
+            "王维",
+            "孟浩然",
+            "李商隐"
+          ],
+          "correct": 1,
+          "explanation": "《春晓》由孟浩然所作。"
+        }
+      ],
+      "rewardKeys": [
+        "water",
+        "draw",
+        "guide"
+      ],
+      "choices": []
+    },
+    {
+      "id": "hanzi",
+      "name": "字义试炼",
+      "person": "字库老人",
+      "kind": "quiz",
+      "scene": "不考偏门典故，只辨字意。把理解变成字卡。",
+      "art": "src/assets/tower/events/quiz.svg",
+      "questions": [
+        {
+          "prompt": "守在本局主要对应哪种战术？",
+          "answers": [
+            "保留部分剩余格挡",
+            "永久增加生命",
+            "直接跳过首领"
+          ],
+          "correct": 0,
+          "explanation": "守让反击后剩余格挡有限保留一次。"
+        },
+        {
+          "prompt": "气与旋打出后，字印可以凝成什么？",
+          "answers": [
+            "气旋丸",
+            "两仪焰莲",
+            "封山印"
+          ],
+          "correct": 0,
+          "explanation": "气＋旋是气旋丸的一阶配方。"
+        }
+      ],
+      "rewardKeys": [
+        "hold",
+        "spin",
+        "qi"
+      ],
+      "choices": []
+    },
+    {
+      "id": "firetest",
+      "name": "焰纹考校",
+      "person": "炼字师",
+      "kind": "quiz",
+      "scene": "炼字师检查你是否懂得火焰与组合。",
+      "art": "src/assets/tower/events/quiz.svg",
+      "questions": [
+        {
+          "prompt": "普通灼痕何时伤害敌人？",
+          "answers": [
+            "回合末反击前",
+            "只有开局",
+            "只在休息时"
+          ],
+          "correct": 0,
+          "explanation": "回合末先结算灼痕伤害，再反击。"
+        },
+        {
+          "prompt": "两仪焰莲需要哪两张不同层级火焰牌？",
+          "answers": [
+            "火与炎",
+            "刀与盾",
+            "水与山"
+          ],
+          "correct": 0,
+          "explanation": "初焰火＋盛焰炎可凝两仪焰莲。"
+        }
+      ],
+      "rewardKeys": [
+        "fire",
+        "flame",
+        "ember"
+      ],
+      "choices": []
+    },
+    {
+      "id": "guardtest",
+      "name": "山门试卷",
+      "person": "守山人",
+      "kind": "quiz",
+      "scene": "学会防守，就有机会把守势转成震击。",
+      "art": "src/assets/tower/events/quiz.svg",
+      "questions": [
+        {
+          "prompt": "普通格挡在下一回合会怎样？",
+          "answers": [
+            "全部清空",
+            "永久保留",
+            "变成生命"
+          ],
+          "correct": 0,
+          "explanation": "普通格挡会清空，守势效果例外。"
+        },
+        {
+          "prompt": "震的伤害主要取决于？",
+          "answers": [
+            "当前格挡",
+            "牌组张数",
+            "已过楼层"
+          ],
+          "correct": 0,
+          "explanation": "震造成当前格挡值的伤害，然后消耗一半格挡。"
+        }
+      ],
+      "rewardKeys": [
+        "quake",
+        "hold",
+        "rock"
+      ],
+      "choices": []
+    },
+    {
+      "id": "windtest",
+      "name": "旋风谜签",
+      "person": "纸鸢客",
+      "kind": "quiz",
+      "scene": "在风中辨出术式进阶的规则。",
+      "art": "src/assets/tower/events/quiz.svg",
+      "questions": [
+        {
+          "prompt": "气旋丸加入哪个字印可进阶风轮刃？",
+          "answers": [
+            "风",
+            "盾",
+            "藏"
+          ],
+          "correct": 0,
+          "explanation": "气旋丸＋风＝风轮刃。"
+        },
+        {
+          "prompt": "术式进阶是否延长原本到期时间？",
+          "answers": [
+            "不会，继承原期限",
+            "每次延长一整战",
+            "永久不会消散"
+          ],
+          "correct": 0,
+          "explanation": "进阶继承原期限，要把握释放时机。"
+        }
+      ],
+      "rewardKeys": [
+        "wind",
+        "spin",
+        "guide"
+      ],
+      "choices": []
+    },
+    {
+      "id": "yuefei",
+      "name": "风雨旧旌",
+      "person": "岳飞",
+      "kind": "lament",
+      "scene": "古代人物的追思幻境。一面旧旌在风里，你可以选一句原创挽词寄托心意。",
+      "art": "src/assets/tower/events/lament.svg",
+      "note": "原创挽词，无正误和道德评分；不同选择都能获得馈赠。",
+      "choices": [
+        {
+          "label": "山河未改，长风犹记旧旌。",
+          "reply": "你选的挽词被郑重收下。它是本游戏原创文句，不是人物的历史作品。",
+          "effect": {
+            "type": "cards",
+            "keys": [
+              "heavy",
+              "hold",
+              "break"
+            ],
+            "upgraded": true
+          }
+        },
+        {
+          "label": "丹心照夜，归梦不问功名。",
+          "reply": "你选的挽词被郑重收下。它是本游戏原创文句，不是人物的历史作品。",
+          "effect": {
+            "type": "cards",
+            "keys": [
+              "heavy",
+              "hold",
+              "break"
+            ],
+            "upgraded": true
+          }
+        },
+        {
+          "label": "把难言的遗憾留在笔下，再写一字。",
+          "reply": "你选的挽词被郑重收下。它是本游戏原创文句，不是人物的历史作品。",
+          "effect": {
+            "type": "craft",
+            "keys": [
+              "heavy",
+              "hold",
+              "break"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "xiangyu",
+      "name": "江畔回声",
+      "person": "项羽",
+      "kind": "lament",
+      "scene": "江边只剩浪声。此处容许惋惜，也容许看见普通人的归途。",
+      "art": "src/assets/tower/events/lament.svg",
+      "note": "原创挽词，无正误和道德评分；不同选择都能获得馈赠。",
+      "choices": [
+        {
+          "label": "楚歌散尽，一江月色送归人。",
+          "reply": "你选的挽词被郑重收下。它是本游戏原创文句，不是人物的历史作品。",
+          "effect": {
+            "type": "cards",
+            "keys": [
+              "heavy",
+              "gather",
+              "break"
+            ],
+            "upgraded": true
+          }
+        },
+        {
+          "label": "愿后来者，都有再回故乡的路。",
+          "reply": "你选的挽词被郑重收下。它是本游戏原创文句，不是人物的历史作品。",
+          "effect": {
+            "type": "cards",
+            "keys": [
+              "heavy",
+              "gather",
+              "break"
+            ],
+            "upgraded": true
+          }
+        },
+        {
+          "label": "以一字寄意，亲手写下未尽之言。",
+          "reply": "你选的挽词被郑重收下。它是本游戏原创文句，不是人物的历史作品。",
+          "effect": {
+            "type": "craft",
+            "keys": [
+              "heavy",
+              "gather",
+              "break"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "quyuan",
+      "name": "汨罗灯影",
+      "person": "屈原",
+      "kind": "lament",
+      "scene": "水上浮着一盏灯。你可以用原创文句，记下一个求索不止的人。",
+      "art": "src/assets/tower/events/lament.svg",
+      "note": "原创挽词，无正误和道德评分；不同选择都能获得馈赠。",
+      "choices": [
+        {
+          "label": "长路未央，灯火仍照求索人。",
+          "reply": "你选的挽词被郑重收下。它是本游戏原创文句，不是人物的历史作品。",
+          "effect": {
+            "type": "cards",
+            "keys": [
+              "water",
+              "steady",
+              "guide"
+            ],
+            "upgraded": true
+          }
+        },
+        {
+          "label": "芳草有心，江流替你记清芬。",
+          "reply": "你选的挽词被郑重收下。它是本游戏原创文句，不是人物的历史作品。",
+          "effect": {
+            "type": "cards",
+            "keys": [
+              "water",
+              "steady",
+              "guide"
+            ],
+            "upgraded": true
+          }
+        },
+        {
+          "label": "执笔寄意，让江水带去一个字。",
+          "reply": "你选的挽词被郑重收下。它是本游戏原创文句，不是人物的历史作品。",
+          "effect": {
+            "type": "craft",
+            "keys": [
+              "water",
+              "steady",
+              "guide"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "wen",
+      "name": "零丁灯笺",
+      "person": "文天祥",
+      "kind": "lament",
+      "scene": "海天之间留下一张灯笺。选择原创挽词，留下你愿记住的精神。",
+      "art": "src/assets/tower/events/lament.svg",
+      "note": "原创挽词，无正误和道德评分；不同选择都能获得馈赠。",
+      "choices": [
+        {
+          "label": "风雨虽远，丹心仍照后来人。",
+          "reply": "你选的挽词被郑重收下。它是本游戏原创文句，不是人物的历史作品。",
+          "effect": {
+            "type": "cards",
+            "keys": [
+              "steady",
+              "rock",
+              "hold"
+            ],
+            "upgraded": true
+          }
+        },
+        {
+          "label": "愿这盏灯，照见人间寻常家。",
+          "reply": "你选的挽词被郑重收下。它是本游戏原创文句，不是人物的历史作品。",
+          "effect": {
+            "type": "cards",
+            "keys": [
+              "steady",
+              "rock",
+              "hold"
+            ],
+            "upgraded": true
+          }
+        },
+        {
+          "label": "将心意写成字卡，随身携行。",
+          "reply": "你选的挽词被郑重收下。它是本游戏原创文句，不是人物的历史作品。",
+          "effect": {
+            "type": "craft",
+            "keys": [
+              "steady",
+              "rock",
+              "hold"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "jike",
+      "name": "旧庭空枝",
+      "person": "嵇康",
+      "kind": "lament",
+      "scene": "琴声消散后的庭院。你愿怎样记住那个不肯轻易折腰的人？",
+      "art": "src/assets/tower/events/lament.svg",
+      "note": "原创挽词，无正误和道德评分；不同选择都能获得馈赠。",
+      "choices": [
+        {
+          "label": "弦声虽歇，清风不肯低眉。",
+          "reply": "你选的挽词被郑重收下。它是本游戏原创文句，不是人物的历史作品。",
+          "effect": {
+            "type": "cards",
+            "keys": [
+              "wind",
+              "hide",
+              "steady"
+            ],
+            "upgraded": true
+          }
+        },
+        {
+          "label": "愿山林有路，容得一颗自由心。",
+          "reply": "你选的挽词被郑重收下。它是本游戏原创文句，不是人物的历史作品。",
+          "effect": {
+            "type": "cards",
+            "keys": [
+              "wind",
+              "hide",
+              "steady"
+            ],
+            "upgraded": true
+          }
+        },
+        {
+          "label": "不替他作答，只亲写一字相送。",
+          "reply": "你选的挽词被郑重收下。它是本游戏原创文句，不是人物的历史作品。",
+          "effect": {
+            "type": "craft",
+            "keys": [
+              "wind",
+              "hide",
+              "steady"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "jingke",
+      "name": "易水寒灯",
+      "person": "荆轲",
+      "kind": "lament",
+      "scene": "易水幻境里，送行者只留一盏寒灯。你可以选一句原创文句。",
+      "art": "src/assets/tower/events/lament.svg",
+      "note": "原创挽词，无正误和道德评分；不同选择都能获得馈赠。",
+      "choices": [
+        {
+          "label": "一灯送远，易水长记未归人。",
+          "reply": "你选的挽词被郑重收下。它是本游戏原创文句，不是人物的历史作品。",
+          "effect": {
+            "type": "cards",
+            "keys": [
+              "hide",
+              "heavy",
+              "spin"
+            ],
+            "upgraded": true
+          }
+        },
+        {
+          "label": "愿来时山河，不再需要孤身赴险。",
+          "reply": "你选的挽词被郑重收下。它是本游戏原创文句，不是人物的历史作品。",
+          "effect": {
+            "type": "cards",
+            "keys": [
+              "hide",
+              "heavy",
+              "spin"
+            ],
+            "upgraded": true
+          }
+        },
+        {
+          "label": "把牵挂落在纸上，亲写送行之字。",
+          "reply": "你选的挽词被郑重收下。它是本游戏原创文句，不是人物的历史作品。",
+          "effect": {
+            "type": "craft",
+            "keys": [
+              "hide",
+              "heavy",
+              "spin"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "furnace",
+      "name": "废炉余火",
+      "person": "塔中奇景",
+      "kind": "adventure",
+      "scene": "废弃炉台里有一团未熄的火。热浪的代价已标在入口。",
+      "art": "src/assets/tower/events/adventure.svg",
+      "choices": [
+        {
+          "label": "深入探寻 · 消耗8生命，获得强化字卡三选一",
+          "reply": "你带着收获返回。风险和所得在行动前已经写明。",
+          "effect": {
+            "type": "risk",
+            "cost": 8,
+            "keys": [
+              "fire",
+              "flame",
+              "ash"
+            ]
+          }
+        },
+        {
+          "label": "谨慎绕行 · 获得普通字卡三选一",
+          "reply": "你找到一处安全岔路，取得了较平稳的收获。",
+          "effect": {
+            "type": "cards",
+            "keys": [
+              "fire",
+              "flame",
+              "ash"
+            ],
+            "upgraded": false
+          }
+        },
+        {
+          "label": "放弃探索，歇脚回复8生命",
+          "reply": "此行留些余力，也是一种选择。",
+          "effect": {
+            "type": "heal",
+            "amount": 8
+          }
+        }
+      ]
+    },
+    {
+      "id": "cliff",
+      "name": "断崖风铃",
+      "person": "塔中奇景",
+      "kind": "adventure",
+      "scene": "风铃挂在断崖边，崖壁藏着回旋的字纹。",
+      "art": "src/assets/tower/events/adventure.svg",
+      "choices": [
+        {
+          "label": "深入探寻 · 消耗7生命，获得强化字卡三选一",
+          "reply": "你带着收获返回。风险和所得在行动前已经写明。",
+          "effect": {
+            "type": "risk",
+            "cost": 7,
+            "keys": [
+              "wind",
+              "spin",
+              "qi"
+            ]
+          }
+        },
+        {
+          "label": "谨慎绕行 · 获得普通字卡三选一",
+          "reply": "你找到一处安全岔路，取得了较平稳的收获。",
+          "effect": {
+            "type": "cards",
+            "keys": [
+              "wind",
+              "spin",
+              "qi"
+            ],
+            "upgraded": false
+          }
+        },
+        {
+          "label": "放弃探索，歇脚回复8生命",
+          "reply": "此行留些余力，也是一种选择。",
+          "effect": {
+            "type": "heal",
+            "amount": 8
+          }
+        }
+      ]
+    },
+    {
+      "id": "stone",
+      "name": "裂碑密室",
+      "person": "塔中奇景",
+      "kind": "adventure",
+      "scene": "裂碑后有一条窄道。深处的拓本似乎记着守而后震的力量。",
+      "art": "src/assets/tower/events/adventure.svg",
+      "choices": [
+        {
+          "label": "深入探寻 · 消耗7生命，获得强化字卡三选一",
+          "reply": "你带着收获返回。风险和所得在行动前已经写明。",
+          "effect": {
+            "type": "risk",
+            "cost": 7,
+            "keys": [
+              "guard",
+              "quake",
+              "rock"
+            ]
+          }
+        },
+        {
+          "label": "谨慎绕行 · 获得普通字卡三选一",
+          "reply": "你找到一处安全岔路，取得了较平稳的收获。",
+          "effect": {
+            "type": "cards",
+            "keys": [
+              "guard",
+              "quake",
+              "rock"
+            ],
+            "upgraded": false
+          }
+        },
+        {
+          "label": "放弃探索，歇脚回复8生命",
+          "reply": "此行留些余力，也是一种选择。",
+          "effect": {
+            "type": "heal",
+            "amount": 8
+          }
+        }
+      ]
+    },
+    {
+      "id": "sword",
+      "name": "无主剑匣",
+      "person": "塔中奇景",
+      "kind": "adventure",
+      "scene": "剑匣的机关还在运转。你可以冒险取内层字谱，也可以收下外层拓片。",
+      "art": "src/assets/tower/events/adventure.svg",
+      "choices": [
+        {
+          "label": "深入探寻 · 消耗9生命，获得强化字卡三选一",
+          "reply": "你带着收获返回。风险和所得在行动前已经写明。",
+          "effect": {
+            "type": "risk",
+            "cost": 9,
+            "keys": [
+              "hide",
+              "break",
+              "heavy"
+            ]
+          }
+        },
+        {
+          "label": "谨慎绕行 · 获得普通字卡三选一",
+          "reply": "你找到一处安全岔路，取得了较平稳的收获。",
+          "effect": {
+            "type": "cards",
+            "keys": [
+              "hide",
+              "break",
+              "heavy"
+            ],
+            "upgraded": false
+          }
+        },
+        {
+          "label": "放弃探索，歇脚回复8生命",
+          "reply": "此行留些余力，也是一种选择。",
+          "effect": {
+            "type": "heal",
+            "amount": 8
+          }
+        }
+      ]
+    },
+    {
+      "id": "stream",
+      "name": "倒流墨溪",
+      "person": "塔中奇景",
+      "kind": "adventure",
+      "scene": "墨水在溪里逆流而上。越靠近源头，字的纹路越清楚。",
+      "art": "src/assets/tower/events/adventure.svg",
+      "choices": [
+        {
+          "label": "深入探寻 · 消耗6生命，获得强化字卡三选一",
+          "reply": "你带着收获返回。风险和所得在行动前已经写明。",
+          "effect": {
+            "type": "risk",
+            "cost": 6,
+            "keys": [
+              "water",
+              "guide",
+              "exchange"
+            ]
+          }
+        },
+        {
+          "label": "谨慎绕行 · 获得普通字卡三选一",
+          "reply": "你找到一处安全岔路，取得了较平稳的收获。",
+          "effect": {
+            "type": "cards",
+            "keys": [
+              "water",
+              "guide",
+              "exchange"
+            ],
+            "upgraded": false
+          }
+        },
+        {
+          "label": "放弃探索，歇脚回复8生命",
+          "reply": "此行留些余力，也是一种选择。",
+          "effect": {
+            "type": "heal",
+            "amount": 8
+          }
+        }
+      ]
+    },
+    {
+      "id": "library",
+      "name": "折页藏书楼",
+      "person": "塔中奇景",
+      "kind": "adventure",
+      "scene": "摇摇欲坠的书架里藏着残卷。你看见了风险，也看见了补齐构筑的机会。",
+      "art": "src/assets/tower/events/adventure.svg",
+      "choices": [
+        {
+          "label": "深入探寻 · 消耗6生命，获得强化字卡三选一",
+          "reply": "你带着收获返回。风险和所得在行动前已经写明。",
+          "effect": {
+            "type": "risk",
+            "cost": 6,
+            "keys": [
+              "draw",
+              "guide",
+              "gather"
+            ]
+          }
+        },
+        {
+          "label": "谨慎绕行 · 获得普通字卡三选一",
+          "reply": "你找到一处安全岔路，取得了较平稳的收获。",
+          "effect": {
+            "type": "cards",
+            "keys": [
+              "draw",
+              "guide",
+              "gather"
+            ],
+            "upgraded": false
+          }
+        },
+        {
+          "label": "放弃探索，歇脚回复8生命",
+          "reply": "此行留些余力，也是一种选择。",
+          "effect": {
+            "type": "heal",
+            "amount": 8
+          }
+        }
+      ]
+    },
+    {
+      "id": "brush",
+      "name": "借笔成字",
+      "person": "游方制卡师",
+      "kind": "craft",
+      "scene": "制卡师提供一张纸。你可亲手临摹选定字谱，达标获得强化卡；也能使用稳笔辅助获得普通卡。",
+      "art": "src/assets/tower/events/craft.svg",
+      "choices": [
+        {
+          "label": "借纸借笔，亲自制卡",
+          "reply": "选好字谱后再开始写，纸面尚未消耗。",
+          "effect": {
+            "type": "craft",
+            "keys": [
+              "fire",
+              "qi",
+              "water"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "wukong",
+      "name": "猴王借风",
+      "person": "孙悟空 · 古典小说彩蛋",
+      "kind": "cameo",
+      "scene": "架空客串：一根金箍棒横在云头。猴王笑问你，是借风赶路，还是落笔学一招？",
+      "art": "src/assets/tower/events/cameo.svg",
+      "choices": [
+        {
+          "label": "借一缕风，练回旋之术",
+          "reply": "这是小说彩蛋，不是历史事件。",
+          "effect": {
+            "type": "cards",
+            "keys": [
+              "wind",
+              "spin",
+              "qi"
+            ],
+            "upgraded": false
+          }
+        },
+        {
+          "label": "请猴王看我写一个字",
+          "reply": "他坐在云头等你动笔。（架空对白）",
+          "effect": {
+            "type": "craft",
+            "keys": [
+              "wind",
+              "qi",
+              "fire"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "linghu",
+      "name": "竹林酒客",
+      "person": "令狐冲 · 武侠小说彩蛋",
+      "kind": "cameo",
+      "scene": "架空客串：竹林里的剑客举起酒葫芦，邀你论一论藏锋与出招。",
+      "art": "src/assets/tower/events/cameo.svg",
+      "choices": [
+        {
+          "label": "请教蓄势而发",
+          "reply": "「先稳住，等到合适的一笔。」（架空对白）",
+          "effect": {
+            "type": "cards",
+            "keys": [
+              "hide",
+              "gather",
+              "break"
+            ],
+            "upgraded": false
+          }
+        },
+        {
+          "label": "不用酒，借一张纸切磋",
+          "reply": "剑客笑着让出桌面。（架空对白）",
+          "effect": {
+            "type": "craft",
+            "keys": [
+              "qi",
+              "wind",
+              "fire"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "xiaoyan",
+      "name": "异火过客",
+      "person": "萧炎 · 网文小说彩蛋",
+      "kind": "cameo",
+      "scene": "架空客串：过客掌中浮着两团不同层级的火。他提醒你，组合所用字印必须来自不同实体牌。",
+      "art": "src/assets/tower/events/cameo.svg",
+      "choices": [
+        {
+          "label": "请教异层火焰的融合",
+          "reply": "你记下火与炎，下一场试着凝成两仪焰莲。（架空对白）",
+          "effect": {
+            "type": "cards",
+            "keys": [
+              "fire",
+              "flame",
+              "ember"
+            ],
+            "upgraded": false
+          }
+        },
+        {
+          "label": "亲写一字，体会火焰层级",
+          "reply": "一道字谱落在纸上。（架空对白）",
+          "effect": {
+            "type": "craft",
+            "keys": [
+              "fire",
+              "qi",
+              "wind"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "wangxizhi",
+      "name": "兰亭借纸",
+      "person": "王羲之",
+      "kind": "craft",
+      "scene": "诗意幻境里，书家让出一方纸。他邀请你先临一个字，再将自己的笔迹带进下一场战斗。",
+      "art": "src/assets/tower/events/craft.svg",
+      "choices": [
+        {
+          "label": "亲自临摹一张字卡",
+          "reply": "这段对话为游戏架空创作。字谱已经备好，选字后即可落笔。",
+          "effect": {
+            "type": "craft",
+            "keys": [
+              "water",
+              "wind",
+              "qi"
+            ]
+          }
+        },
+        {
+          "label": "先休息，留待下次再学",
+          "reply": "你记下了这一笔的意趣，调息后继续前行。",
+          "effect": {
+            "type": "heal",
+            "amount": 12
+          }
+        }
+      ]
+    },
+    {
+      "id": "ouyangxun",
+      "name": "碑前正锋",
+      "person": "欧阳询",
+      "kind": "craft",
+      "scene": "碑影下，书家请你稳住笔锋。无须追求速度，沿字谱把这张卡写成自己的模样。",
+      "art": "src/assets/tower/events/craft.svg",
+      "choices": [
+        {
+          "label": "亲自临摹一张字卡",
+          "reply": "这段对话为游戏架空创作。字谱已经备好，选字后即可落笔。",
+          "effect": {
+            "type": "craft",
+            "keys": [
+              "hold",
+              "steady",
+              "heavy"
+            ]
+          }
+        },
+        {
+          "label": "先休息，留待下次再学",
+          "reply": "你记下了这一笔的意趣，调息后继续前行。",
+          "effect": {
+            "type": "heal",
+            "amount": 12
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+# 角色立绘生成提示
+
+工具：内置 imagegen；输入参考：src/assets/characters/shen-yan.png；两个输出均指定真实透明背景。
+
+## 受困立绘
+
+Production transparent PNG game character sprite, one figure only. Reference image is identity/costume reference, not background. Redesign Shen Yan in a physically natural low crouch, one knee touching ground, head lifted looking right toward enemy, shoulders strained, both arms still free enough to hold a small talisman card. Same handsome young Chinese man, black high tied hair, bronze hair clasp, dark muted jade green outer robe, ivory inner robe with ink bamboo, weathered vermilion scarf, jade waist ornaments, dark boots. Elegant Chinese ink wash and fine brush game illustration. Thin organic frost vines wrap his calves and lower waist, with sparse pale frost, visibly rooted around feet, realistically following anatomy, NOT thick loops floating before torso. Giant brush rests diagonally beside knee. Entire body and all accessories visible with generous transparent margin, consistent 3/4 side view facing right. Natural human anatomy, readable silhouette at 250px. No background, no ground rectangle, no black matte, no vignette, no text, no frame. Genuine transparent background. This is the trapped/debuff pose, not a flattened standing pose.
+
+## 迎战立绘
+
+Production transparent PNG game character sprite, one figure only. Reference image is identity/costume reference. Shen Yan now freed, fully standing in a composed ready stance facing right, slightly bent knees, right hand extends a small cream paper talisman card with abstract ink mark, left hand holds his giant green calligraphy brush beside him pointing downward. Same handsome young Chinese man, black high tied hair, bronze hair clasp, dark muted jade green outer robe, ivory inner robe with ink bamboo, weathered vermilion scarf, jade waist ornaments, dark boots. Elegant Chinese ink wash and fine brush game illustration matching reference craftsmanship. Calm determination, no angry grimace. Entire head hair scarf body feet brush visible with generous transparent margins, consistent 3/4 side view facing right, strong silhouette readable at 250px. No vines, no flames, no particles baked into character. No background, no ground rectangle, no black matte, no vignette, no text, no frame. Genuine transparent background.

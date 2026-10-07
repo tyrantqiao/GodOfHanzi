@@ -1,0 +1,173 @@
+/* 雪林墨卷：远景留白，近景浓墨，操作落在宣纸上。 */
+:root {
+  --paper: #eee8db;
+  --paper-deep: #d7cdb9;
+  --gold: #a08a60;
+  --gold-soft: #a08a6033;
+  --frost: #8da8aa;
+  --spirit: #597b79;
+  --hp: #9f453a;
+  --line: #34453d30;
+  --paper-grain: url("./assets/paper-grain.svg");
+}
+body { background: #25332e; }
+.battlefield { background-color: #d9dfd8; }
+.battlefield::before {
+  background: linear-gradient(180deg, #eee8db22, transparent 65%, #e9e5d433), linear-gradient(90deg, #263b3220, transparent 25% 75%, #263b3218);
+}
+.battlefield::after { height: 16%; background: linear-gradient(to top, #eee8db80, transparent); }
+.snow-layer { opacity: .22; }
+.character-art { filter: saturate(.7) contrast(1.04); }
+.blade-companion { width: 68%; opacity: .88; }
+.battle-topbar > div:first-child {
+  padding: 10px 16px; border-left: 3px solid #91483c;
+  background: linear-gradient(90deg, #eee8dbed, #eee8dbb5);
+  box-shadow: 0 2px 8px #26332e14; border-radius: 0;
+}
+.chapter, .enemy-name, .character-name, .info-title, dialog h2 {
+  font-family: "STKaiti", "KaiTi", "SimSun", serif;
+  letter-spacing: .08em;
+}
+.objective, #turn-label { color: #526159; }
+.pause-button, .mentor-tip-trigger {
+  border: 1px solid #6d796555; border-radius: 2px;
+  color: #304139; background: #eee8dbeb; box-shadow: none;
+}
+.enemy-panel {
+  color: #eee8db; background: #263a32e8; border: 1px solid #b5b9a455;
+  border-radius: 2px; box-shadow: 0 6px 18px #18261e20; backdrop-filter: none;
+}
+.enemy-realm { color: #c7cabb; }
+.hud {
+  color: #293b32; border-top: 3px solid #566054;
+  background-image: var(--paper-grain), linear-gradient(110deg, #e8e1d1, #f3eee3 48%, #e5dfcf);
+  box-shadow: 0 -8px 20px #21352b12;
+}
+.hud::before { background: linear-gradient(90deg, transparent 2%, #63715b55 35%, #63715b55 65%, transparent 98%); inset: 3px 0 auto; height: 1px; opacity: 1; }
+.status-card { border-radius: 2px; }
+.status-card:hover, .status-card.active { border-color: #7a8a6b55; background: #667b5810; box-shadow: none; }
+.status-card:focus-visible, button:focus-visible { outline: 2px solid #91483c; outline-offset: 2px; }
+.character-line { color: #293b32; }
+.character-realm { color: #687365; }
+.portrait { border-color: #7c8971; box-shadow: inset 0 0 0 2px #eee8db, 0 2px 5px #24352e20; background: #d2d9cd; }
+.bar { border-radius: 2px; border-color: #36463c60; background: #35443b; box-shadow: none; }
+.bar.hp span { background: linear-gradient(90deg, #783e35, #ae6152); }
+.bar.spirit span { background: linear-gradient(90deg, #3c625f, #7d9690); }
+.status-icons i, .status-icons.muted i { color: #46594b; border-color: #71836950; background: #f8f3e54d; border-radius: 2px; box-shadow: none; }
+.skill-card {
+  border: 1px solid #88917b; border-radius: 2px; color: #263b32;
+  background-image: var(--paper-grain), linear-gradient(110deg, #ddd5c3, #f6f0e3 20% 75%, #e2d9c6);
+  box-shadow: inset 0 0 0 3px #f6f0e3, inset 0 0 0 4px #87917840, 0 3px 6px #24352e18;
+}
+.skill-card::before { inset: 9px; border-top: 1px solid #7a897238; border-bottom: 1px solid #7a897238; background: none; opacity: 1; }
+.skill-card:hover, .skill-card.selected {
+  transform: translateY(-2px); border-color: #98483c;
+  background-image: var(--paper-grain), linear-gradient(110deg, #e9dfcc, #fff8e9 50%, #e9dfcc);
+  box-shadow: inset 0 0 0 3px #f6f0e3, inset 0 0 0 4px #98483c60, 0 4px 8px #24352e20;
+}
+.skill-card.selected::after {
+  content: '印'; position: absolute; top: 12px; right: 11px; padding: 2px;
+  border: 1px solid #98483c; color: #98483c; font: 12px/1.1 "KaiTi", serif; transform: rotate(-7deg);
+}
+.skill-char { text-shadow: none; }
+.skill-name { color: #46584b; background: transparent; letter-spacing: .08em; }
+.skill-cost { color: #6f796b; }
+.info-panel { border: 0; border-left: 1px solid #64755e40; border-radius: 0; background: transparent; box-shadow: none; }
+.info-title { color: #813f35; }
+.info-text { color: #425348; line-height: 1.5; }
+.info-tags span { color: #53654f; border-color: #7a8b6d55; background: #64755e0a; border-radius: 2px; }
+.cast-button { color: #fff6e5; background: linear-gradient(100deg, #783d34, #9d5545); border: 1px solid #763e34; border-radius: 2px; box-shadow: inset 0 0 0 2px #e0b7a325; text-shadow: none; }
+#rest-button { background: #d4dbcf; color: #3c5143; border-color: #7a89726b; border-radius: 2px; }
+.combat-log { color: #536153; background: #6d7b5e0c; border-color: #71836930; }
+.mentor-bubble { background: #eee8dbf2; color: #344c3b; border-color: #728267; border-radius: 2px; box-shadow: 0 4px 12px #1f392c20; }
+.enemy.targeted { filter: drop-shadow(0 2px 3px #34483d80); }
+.enemy-combo-status { color: #ead2bd; background: #6d3d32; border-color: #c29375; box-shadow: none; }
+.floating-number { font-family: "KaiTi", "SimSun", serif; font-size: 34px; text-shadow: 1px 1px #f5eee0; }
+dialog, #writing-dialog, #writing-dialog[data-skill] {
+  color: #304337; background: #eee8db; background-image: var(--paper-grain);
+  border: 1px solid #78866c; border-radius: 2px; box-shadow: 0 14px 45px #172c2545, inset 0 0 0 4px #f8f1e6; backdrop-filter: none;
+}
+dialog::backdrop { background: #162b2855; }
+dialog button { background: #344d40; color: #f4eddc; border-color: #63745b; border-radius: 2px; }
+.writing-live { color: #3e5344; border-color: #7a8b6d50; background: #7c8b650c; }
+.writing-guide { color: #425348; border-left-color: #994f3f; background: #7c8b650a; }
+#writing-countdown, #writing-live-power { color: #813f35; }
+#writing-countdown.urgent { color: #a12f25; }
+dialog button:disabled { opacity: .5; cursor: default; }
+.writing-live-track { background: #ced4c7; border-radius: 2px; }
+#writing-dialog[data-skill] #writing-canvas { border-color: #8d957b; box-shadow: 0 2px 6px #283b2f20; }
+#writing-dialog[data-skill] #writing-live-fill { background: linear-gradient(90deg, #506b59, #89997b); box-shadow: none; }
+#writing-dialog[data-skill="dao"] #writing-live-fill { background: linear-gradient(90deg, #894738, #bc8360); }
+.opening-copy { border-left-color: #b7785b; background: linear-gradient(90deg, #1f332be6, #1f332b66); }
+.opening-kicker { color: #d1ba94; }
+.battle-omen { background: #293f35ed; color: #e9dfc8; border-color: #899a7d; box-shadow: 0 4px 18px #21342b30; }
+.result-hook { color: #5c684f; background: #6b815a12; border-left-color: #994f3f; }
+/* 墨骨和飞白叠在已有演出上，保留实体、时序及强弱判定。 */
+.fire-trail { background-image: repeating-linear-gradient(174deg, transparent 0 9px, #eee8db80 10px 11px, transparent 12px 23px), linear-gradient(90deg, transparent, #302f29aa 20%, #914b3cd9 65%, #ca9563); }
+.blade-dash, .blade-cut { background-image: repeating-linear-gradient(177deg, transparent 0 2px, #eee8db99 3px 4px, transparent 5px 8px), linear-gradient(90deg, transparent, #2b4036 25%, #e8e1cd 50%, #50675a 70%, transparent); }
+.blade-attack.combo .blade-dash, .blade-attack.combo .blade-cut { background-image: repeating-linear-gradient(177deg, transparent 0 3px, #ead2b899 4px 5px, transparent 6px 9px), linear-gradient(90deg, transparent, #793e32 25%, #d5ac75 50%, #a75b40 70%, transparent); }
+.stop-script-band { background-image: var(--paper-grain), linear-gradient(90deg, #64715d, #eee4cd 25% 75%, #64715d); border-radius: 1px; }
+.life-totem { background-image: repeating-linear-gradient(93deg, #182f2922 0 2px, transparent 3px 9px), linear-gradient(100deg, #293e32, #667258, #304537); }
+.perfect-ritual { opacity: .8; }
+.perfect-sigil, .perfect-impact { border-style: double; border-color: #957747; }
+.channel-glyph { color: #35483a; }
+.battlefield[data-channel-skill="dao"] .channel-glyph { color: #954b38; }
+.battlefield[data-channel-skill="zhan"] .channel-glyph { color: #354a43; }
+.battlefield[data-channel-skill="ding"] .channel-glyph { color: #52624b; }
+.battlefield[data-channel-skill="jing"] .channel-glyph { color: #667c51; }
+/* 火与刀：卡面淡墨引题，战場实体浓墨成形。 */
+.skill-card[data-skill="dao"]::before, .skill-card[data-skill="zhan"]::before {
+  inset: 12% 8% 25%; border: 0; opacity: .13;
+  background: url("./assets/cinnabar-flame.svg") center / contain no-repeat;
+}
+.skill-card[data-skill="zhan"]::before {
+  inset: 22% -30% 32%; background-image: url("./assets/summoned-blade.svg"); transform: rotate(-52deg); opacity: .16;
+}
+.skill-card[data-skill="dao"] .skill-char { color: #914735; }
+.skill-card[data-skill="zhan"] .skill-char { color: #34473d; }
+.skill-card[data-skill="dao"] .skill-name, .skill-card[data-skill="zhan"] .skill-name { border-top: 1px solid #786e5640; padding-top: 6px; }
+.blade-companion, .blade-companion.flaming { filter: none; width: 57%; left: 67%; top: 16%; }
+.fire-ignition, .fire-impact, .fire-tongue {
+  background: url("./assets/cinnabar-flame.svg") center / contain no-repeat;
+  border-radius: 0; aspect-ratio: 180 / 220;
+}
+.fire-ignition { width: 85px; }
+.fire-impact { width: 170px; }
+.fire-attack.perfect .fire-impact { width: 215px; }
+.fire-attack.weak .fire-impact { width: 110px; }
+.fire-ignition::before, .fire-impact::before { display: none; }
+.fire-impact::after {
+  inset: 25% 8% 8%; border: 0; border-radius: 0;
+  background: repeating-linear-gradient(168deg, transparent 0 13px, #383f3180 14px 16px, transparent 17px 30px);
+  clip-path: polygon(2% 45%, 36% 35%, 55% 0, 60% 35%, 98% 24%, 76% 60%, 90% 92%, 47% 78%, 14% 100%, 22% 63%);
+}
+.fire-trail {
+  height: 44px; top: calc(48% - 22px);
+  clip-path: polygon(0 54%, 13% 39%, 34% 24%, 58% 29%, 79% 13%, 100% 38%, 91% 61%, 68% 54%, 45% 74%, 24% 60%, 7% 72%);
+}
+.fire-ember { border-radius: 0; clip-path: polygon(40% 0, 100% 30%, 55% 100%, 0 70%); background: #9c513a; }
+.blade-summon-ring { border: 0; border-radius: 0; background: linear-gradient(175deg, transparent 35%, #34473d60 38% 42%, transparent 45% 56%, #34473d35 59% 61%, transparent 64%); }
+.blade-summon-ring::after { border: 0; }
+.blade-flames { opacity: .85; }
+.blade-flames::before { inset: 19% 4% 12% 27%; background: linear-gradient(0deg, #994b3555, transparent 75%); border-radius: 0; }
+.blade-flames i { width: 10%; bottom: 25%; background: url("./assets/cinnabar-flame.svg") center bottom / contain no-repeat; border-radius: 0; mix-blend-mode: normal; }
+.blade-attack.combo .blade-flash { background: radial-gradient(ellipse, #be885b66, #7a413322 45%, transparent 70%); }
+.battlefield[data-channel-skill="dao"] .writing-channel::before {
+  inset: -35% -50%; border-radius: 0; background: url("./assets/cinnabar-flame.svg") center / contain no-repeat;
+  opacity: calc(var(--writing-opacity, .3) * .32); animation: none;
+}
+.battlefield[data-channel-skill="zhan"] .writing-channel::after {
+  top: 15%; width: 210px; height: 65px; background: url("./assets/summoned-blade.svg") center / contain no-repeat;
+  transform: rotate(-36deg); opacity: calc(var(--writing-opacity, .3) * .35);
+}
+.battlefield[data-channel-skill="dao"] .channel-glyph, .battlefield[data-channel-skill="zhan"] .channel-glyph { filter: none; text-shadow: 1px 1px #eee8db !important; }
+@media (prefers-reduced-motion: reduce) {
+  .blade-flames i { animation: none; }
+  .fire-impact::after { animation: none; }
+}
+@media (max-width: 640px) {
+  .battle-topbar > div:first-child { padding: 6px 9px; }
+  .skill-card.selected::after { top: 5px; right: 4px; font-size: 10px; }
+  .info-panel { border-left: 0; border-top: 1px solid #64755e40; }
+  .floating-number { font-size: 26px; }
+}

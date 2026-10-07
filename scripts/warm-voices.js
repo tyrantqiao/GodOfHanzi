@@ -10,14 +10,18 @@ try {
   }
   if (!service.status().ready) throw new Error('Voice model loading timed out');
   const lines = [
-    ...['一', '刀', '人', '止'].flatMap(text => ['hero', 'mentor'].map(role => [text, role])),
+    ...['火', '刀', '止', '生'].flatMap(text => ['hero', 'mentor'].map(role => [text, role])),
     ['凝神落笔，字正则术成。', 'mentor'],
     ['师父，我准备好了。', 'hero'],
-    ['好，先从一横开始。落笔要稳，空处留白。', 'mentor'],
-    ['看淡墨底字落笔：覆盖该有的笔画，避开空白。覆盖与准确双过90%，便是完美。', 'mentor'],
-    ['笔画偏得多了些。先追淡墨的骨架，覆盖上去，再谈速度。', 'mentor'],
-    ['墨铺得太满，空白也被吞了。宁可少写一分，也别把画布涂成一团。', 'mentor'],
-    ['已能成招。想要完美，就让覆盖和准确同时到90%以上。', 'mentor'],
+    ['先写火，点燃霜藤。再写刀，借火斩藤。', 'mentor'],
+    ['顺着淡墨落笔。稳住笔锋。', 'mentor'],
+    ['好字！这一笔成了。', 'mentor'],
+    ['好字！笔势圆满。', 'mentor'],
+    ['墨铺得太满。留些空白。', 'mentor'],
+    ['笔画偏了。贴着淡墨再写。', 'mentor'],
+    ['字已成形。再稳一点。', 'mentor'],
+    ['笔力还浅。再贴近淡墨。', 'mentor'],
+    ['调息回气。留心反击。', 'mentor'],
     ['字都不会写了吗', 'enemy'],
     ['走火入魔了吗', 'enemy'],
   ];

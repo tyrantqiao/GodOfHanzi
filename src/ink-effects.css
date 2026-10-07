@@ -1,0 +1,46 @@
+/* 水墨术法：墨骨、飞白、淡彩；保留原有动作与实体轮廓。 */
+.skill-effect *, .skill-effect *::before, .skill-effect *::after { box-shadow: none !important; filter: none !important; }
+.blade-companion, .blade-companion.flaming { filter: drop-shadow(0 2px 2px #18252266); }
+.blade-companion.flaming { filter: sepia(.45) drop-shadow(0 2px 2px #763c32); }
+.blade-dash, .blade-cut { background: linear-gradient(90deg, transparent, #263530 25%, #eee8d9 48%, #263530 65%, transparent); clip-path: polygon(0 45%, 12% 20%, 40% 0, 65% 28%, 100% 48%, 72% 78%, 20% 100%); }
+.blade-cut::after { border-color: #f0ebe0; }
+.blade-attack.combo .blade-dash, .blade-attack.combo .blade-cut { background: linear-gradient(90deg, transparent, #71352d 25%, #e1c3a0 48%, #9c4334 65%, transparent); }
+.blade-flash, .blade-attack.combo .blade-flash { background: radial-gradient(circle, #ede5d5aa, #34494055 35%, transparent 65%); }
+.blade-summon-ring { border-color: #46594c; }
+.blade-spark { background: #34463f; }
+.blade-attack.combo .blade-spark { background: #9b4839; }
+.blade-flames { opacity: .65; }
+.blade-flames::before, .blade-flames i { background: linear-gradient(0deg, #793a30, #ba6d46 40%, #d9b58155 70%, transparent); mix-blend-mode: normal; }
+.fire-ignition, .fire-impact { background: radial-gradient(circle, #dfc59a 0 10%, #ab583a 30%, #703d32aa 50%, transparent 72%); }
+.fire-ignition::before, .fire-impact::before { background: radial-gradient(ellipse at 50% 85%, #c9a36b, #a35137 35%, #492e2c88 55%, transparent 72%); animation-duration: 650ms; }
+.fire-trail { background: linear-gradient(90deg, transparent, #3a332e99 20%, #8a4638cc 55%, #c29969 85%, #ac6041); }
+.fire-tongue { background: radial-gradient(ellipse at 62% 73%, #dbc19c 0 10%, #b77849 32%, #854434 60%, transparent 83%); }
+.fire-impact::after { border-color: #904b3f; border-width: 2px; border-style: dashed; }
+.fire-ember { background: #a45c40; }
+.stop-script-band { border-color: #aca58e; background: linear-gradient(90deg, #5d655baa, #d8d0b9ef 25% 75%, #5d655baa); color: #263831; }
+.stop-effect .stop-stamp, .stop-effect.perfect .stop-stamp { color: #304a42; text-shadow: 1px 1px #eee9d5; filter: none; }
+.stop-effect .stop-ring { border-color: #61766a; }
+.enemy.sealed-visual { filter: saturate(.55); }
+.life-totem { border-color: #8a9675; background: linear-gradient(100deg, #273e32, #536049, #293b32); color: #dad7b9; }
+.life-vine { border-color: #596f50; border-right-color: transparent; border-bottom-color: transparent; }
+.life-vine::before, .life-vine::after { background: #647c5a; border-color: #8c9e75; }
+.life-flower, .life-flower::after { background: #c6ad72; }
+.life-flower i { background: linear-gradient(#e9e1d4, #b5847e); border-color: #c8b3a3; }
+.life-aura { background: radial-gradient(ellipse, #d6d7b633, #78907344 38%, transparent 72%); }
+.life-ring { border-color: #7c9273; }
+.life-mote { background: #80916e; width: 4px; height: 7px; }
+.frost-tendril { border-color: #2e4139; border-left-color: transparent; background: none; box-shadow: inset 0 1px 2px #bdc8b7, 0 2px 3px #14292055; }
+.frost-tendril i { background: linear-gradient(120deg, #d5ddd3, #82998d 70%, #32463a); filter: none; }
+.vine-shard { background: linear-gradient(#97a99b, #304438); }
+.perfect-ritual { opacity: .5; }
+.perfect-ritual *, .perfect-ritual *::before, .perfect-ritual *::after { box-shadow: none !important; filter: none !important; }
+.perfect-flash { display: none; }
+.perfect-sigil, .perfect-impact, .perfect-impact::before, .perfect-impact::after { border-color: #a99269; }
+.perfect-stream { background: linear-gradient(90deg, transparent, #dad1b4, #6c6651, transparent); }
+.perfect-spark { background: #716950; }
+.combo-banner { background: #ded2b7ed; color: #783b30; border: 1px solid #86664d; text-shadow: none; box-shadow: 0 3px 5px #17241f44; }
+.channel-glyph { filter: saturate(.35); text-shadow: 0 2px 3px #182820 !important; }
+.writing-channel::before, .writing-channel::after { filter: saturate(.3); box-shadow: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  .blade-flames i, .fire-ignition::before, .fire-impact::before { animation: none; }
+}

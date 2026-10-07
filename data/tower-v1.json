@@ -1,0 +1,144 @@
+{
+  "floors": 9,
+  "maxHp": 60,
+  "energy": 3,
+  "handSize": 5,
+  "restHeal": 18,
+  "upgradeBonus": 3,
+  "starter": [
+    "blade",
+    "blade",
+    "blade",
+    "blade",
+    "guard",
+    "guard",
+    "guard",
+    "guard",
+    "fire",
+    "draw"
+  ],
+  "cards": {
+    "blade": {
+      "char": "刀",
+      "name": "斩势",
+      "cost": 1,
+      "damage": 7,
+      "detonate": true,
+      "type": "attack",
+      "art": "src/assets/cards/martial-bamboo-blades.png"
+    },
+    "guard": {
+      "char": "山",
+      "name": "固守",
+      "cost": 1,
+      "block": 7,
+      "type": "defense",
+      "art": "src/assets/cards/art-landscape.png"
+    },
+    "fire": {
+      "char": "火",
+      "name": "引燃",
+      "cost": 1,
+      "damage": 4,
+      "burn": 2,
+      "type": "technique",
+      "art": "src/assets/cards/fire-torch.png"
+    },
+    "draw": {
+      "char": "理",
+      "name": "调序",
+      "cost": 1,
+      "draw": 2,
+      "type": "technique",
+      "art": "src/assets/cards/art-poetry.png"
+    },
+    "stop": {
+      "char": "止",
+      "name": "压制",
+      "cost": 1,
+      "block": 4,
+      "weaken": 4,
+      "type": "defense",
+      "art": "src/assets/cards/art-bronze.png"
+    },
+    "heavy": {
+      "char": "斩",
+      "name": "断岳",
+      "cost": 2,
+      "damage": 18,
+      "type": "attack",
+      "art": "src/assets/cards/martial-night-swordsman.png"
+    }
+  },
+  "enemies": [
+    {
+      "name": "霜藤妖",
+      "hp": 25,
+      "attacks": [
+        7,
+        10,
+        6
+      ]
+    },
+    {
+      "name": "寒墨妖",
+      "hp": 28,
+      "attacks": [
+        6,
+        8,
+        12
+      ]
+    },
+    {
+      "name": "碑蛀",
+      "hp": 32,
+      "attacks": [
+        10,
+        5,
+        9
+      ]
+    }
+  ],
+  "scaling": {
+    "hpPerFloor": 3,
+    "attackPerFloor": 1,
+    "eliteHp": 12,
+    "eliteAttack": 3
+  },
+  "boss": {
+    "name": "镇塔墨魇",
+    "hp": 72,
+    "attacks": [
+      14,
+      18,
+      10
+    ]
+  },
+  "starterDeck": {
+    "name": "初行 · 火刀",
+    "description": "先以山守势，再用火留下灼痕，接刀引爆；理帮助寻找关键字卡。",
+    "strategy": [
+      "山：观察敌方意图，格挡只保留到本回合结束。",
+      "火 → 刀：先施加灼痕，再引爆，每层灼痕额外造成2伤害。",
+      "理：抽2张牌，但需要1文气；留出费用打出抽到的牌。"
+    ]
+  },
+  "cardTypes": {
+    "attack": {
+      "name": "攻击",
+      "description": "直接造成伤害，负责击败妖物。"
+    },
+    "defense": {
+      "name": "防守",
+      "description": "获得格挡或压制敌方攻击，减少本回合伤害。"
+    },
+    "technique": {
+      "name": "术法",
+      "description": "抽牌、施加状态与调整资源，连接牌组联动。"
+    },
+    "summon": {
+      "name": "召唤",
+      "description": "后续开放：唤出持续作战的字灵。"
+    }
+  }
+}

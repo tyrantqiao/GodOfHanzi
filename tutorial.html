@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>汉字成圣 · 雪林制卡</title><link rel="stylesheet" href="src/card-tutorial.css"></head>
+<body><main>
+<section class="field" aria-label="雪林战场">
+<header><div><span class="kicker">第一卷 · 雪林制卡</span><h1 id="chapter-title">一 · 执卡迎敌</h1><p id="objective">以手中字卡击退霜藤幼妖</p></div><button id="menu-open">菜单</button></header>
+<aside class="enemy-status"><h2 id="enemy-name"></h2><div id="enemy-hp"></div><strong id="intent"></strong><p id="enemy-states"></p></aside>
+<img class="mentor" src="src/assets/characters/lu-qingya.png" alt="导师陆青崖"><img class="hero" src="src/assets/characters/shen-yan-bound-v2.png" alt="主角沈砚"><img class="enemy" src="src/assets/characters/frost-vine.png" alt="霜藤妖">
+<div id="effect" aria-hidden="true"></div><aside class="lesson"><span>陆青崖</span><p id="lesson-text" aria-live="polite"></p></aside>
+</section>
+<section class="hud" aria-label="卡牌操作栏"><div class="round-meta"><span id="hero-status"></span><strong id="energy"></strong><span id="round"></span><button id="end-turn">结束回合</button></div>
+<div id="hand" aria-label="当前手牌"></div>
+<div class="piles"><button data-pile="draw">抽牌堆</button><button data-pile="discard">弃牌堆</button><button data-pile="exhaust">燃尽区</button><button data-pile="deck">牌册</button><button id="rank-guide">卡阶 / 书写品质</button></div><p id="log" role="status"></p>
+<section id="journey" hidden><h2 id="journey-title"></h2><p id="journey-copy"></p><button id="journey-next"></button></section></section>
+</main>
+<dialog id="menu"><h2>雪林行囊</h2><p>暂停时，妖物不会行动。</p><label><input id="sfx-enabled" type="checkbox" checked> 战斗音效</label><p><label><input id="voice-enabled" type="checkbox" checked> 角色语音</label></p><label for="voice-volume">语音音量</label><input id="voice-volume" type="range" min="0" max="1" step="0.05" value="0.8"><p><button id="voice-preview">试听对白</button> <button id="voice-stop">跳过语音</button></p><p id="voice-status" role="status">正在连接语音服务</p><p><button id="save">保存进度</button> <button id="load">读取存档</button></p><p id="save-status" role="status"></p><p><button id="new-run">重启新手关</button> <button id="resume">返回战场</button></p><a href="legacy.html">查看旧版书写战斗</a></dialog>
+<dialog id="pile-dialog"><h2 id="pile-title"></h2><div id="pile-list"></div><button id="pile-close">返回战场</button></dialog>
+<dialog id="craft-dialog" aria-labelledby="craft-title"><h2 id="craft-title">二 · 亲笔制卡</h2><p>落笔开始计时，重写不续时；失笔可毁纸，失败不扣纸墨。</p><div id="recipes"></div><div class="craft-layout"><canvas id="craft-canvas" width="400" height="400" tabindex="0" aria-label="制卡描写画布"></canvas><div><h3 id="craft-card-name"></h3><p id="craft-preview"></p><p id="craft-materials"></p><p id="craft-score" role="status">落笔凝字</p><button id="rewrite">重写</button> <button id="craft-confirm">确认成卡</button><p><button id="craft-close">暂收笔案</button></p></div></div></dialog>
+<script type="module" src="src/card-tutorial.js"></script></body></html>

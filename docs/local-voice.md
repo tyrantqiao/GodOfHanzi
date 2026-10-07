@@ -22,6 +22,8 @@ The initial voice setting is on; the first click or key press unlocks audio.
 Volume, skip and preview controls are in
 the pause menu. Missing models or synthesis errors do not block gameplay.
 
+当前教学提示在屏幕上保留完整说明，语音只朗读较短的关键句；播放器削减浑浊低中频并使用较轻的动态压缩。修改 `voice-service.js` 中的角色语速后需重启服务，新参数会生成不同的缓存键，无需手动清理旧 WAV。
+
 ## Linux
 
 Use a supported Node.js release and a glibc-based distribution such as Debian

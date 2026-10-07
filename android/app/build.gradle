@@ -1,0 +1,29 @@
+plugins { id 'com.android.application' }
+def releaseVersion = new groovy.json.JsonSlurper().parse(rootProject.file('version.json'))
+android {
+    namespace 'com.godofhanzi.game'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'com.godofhanzi.game'
+        minSdk 28
+        targetSdk 35
+        versionCode = (System.getenv('ANDROID_VERSION_CODE') ?: releaseVersion.versionCode.toString()).toInteger()
+        versionName = (System.getenv('ANDROID_VERSION_NAME') ?: releaseVersion.versionName)
+    }
+    signingConfigs {
+        release {
+            storeFile file(System.getenv('ANDROID_KEYSTORE') ?: '../release.jks')
+            storePassword System.getenv('ANDROID_STORE_PASSWORD')
+            keyAlias 'hanzi'
+            keyPassword System.getenv('ANDROID_KEY_PASSWORD')
+        }
+    }
+    buildTypes { release { signingConfig signingConfigs.release } }
+}
+dependencies {
+    implementation 'androidx.webkit:webkit:1.12.1'
+    implementation 'androidx.core:core:1.15.0'
+}
+
+
+

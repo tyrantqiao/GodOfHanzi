@@ -2,3 +2,13 @@ node_modules/
 models/
 data/voice-cache/
 
+
+# 安卓构建与私有签名
+android/.gradle/
+android/**/build/
+android/app/src/main/assets/
+android/local.properties
+android/*.jks
+.android-private/
+
+/dist/

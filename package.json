@@ -6,8 +6,12 @@
   "scripts": {
     "dev": "node server.js",
     "start": "node server.js",
+    "prepare": "git config core.hooksPath .githooks",
     "voice:warm": "node scripts/warm-voices.js",
-    "test": "node --test src/writing-score.test.js voice-service.test.js"
+    "test": "node --test src/tower-core.test.js src/tower-combos.test.js src/tower-events.test.js src/craft-session.test.js src/writing-score.test.js src/battle.test.js src/card-tutorial-core.test.js voice-service.test.js server.test.js",
+    "tower:playtest": "node scripts/playtest-tower.js",
+    "tower:assets": "node scripts/generate-tower-assets.js && node scripts/generate-encounter-assets.js",
+    "tower:catalogs": "node scripts/generate-tower-catalogs.js"
   },
   "dependencies": {
     "sherpa-onnx-node": "^1.13.8"

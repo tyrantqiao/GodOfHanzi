@@ -1,0 +1,6 @@
+# 安卓图标设计
+
+使用内置 image_gen 生成。金色「字」印代表汉字书写与成圣，朱砂卡牌代表构筑，墨山云雾与古塔呼应爬塔修仙。图标已接入 AndroidManifest.xml；已有 Release APK 不随资源修改自动改变。
+
+生成提示词：
+Use case: stylized-concept. Create a finished square Android launcher icon for the Chinese ink fantasy roguelike game 汉字成圣 (God of Hanzi), about handwritten Chinese character cards, cultivation and climbing a tower. One icon only, full bleed square 1024x1024, no mockup, no rounded outer corners. Deep charcoal ink background with very restrained ink mist and subtle distant tower silhouette. The unmistakable large Chinese character “字” in expressive yet correctly formed gold brush calligraphy is the central emblem, centered within the middle 60% of the canvas so circular Android cropping is safe. Behind the glyph a single upright cinnabar-red talisman/card with antique gold rim, simple broad silhouette, suggesting a handwritten spell card. Elegant rich gold ink, warm cinnabar, black ink palette. Strong silhouette and high contrast legible at 48px. Refined Chinese ink painting meets premium fantasy game emblem, slight embossed gold texture, restrained magical glow. Only text is the single accurate Chinese character 字. No extra lettering, no English, no faces, no weapons, no UI, no watermark, no tiny ornate clutter.

@@ -1,0 +1,847 @@
+{
+  "floors": 9,
+  "maxHp": 60,
+  "energy": 3,
+  "handSize": 5,
+  "restHeal": 18,
+  "upgradeBonus": 3,
+  "starter": [
+    "blade",
+    "blade",
+    "blade",
+    "blade",
+    "guard",
+    "guard",
+    "guard",
+    "guard",
+    "fire",
+    "draw"
+  ],
+  "cards": {
+    "blade": {
+      "char": "刀",
+      "name": "斩势",
+      "cost": 1,
+      "damage": 7,
+      "detonate": true,
+      "type": "attack",
+      "art": "src/assets/tower/blade.svg",
+      "tags": [
+        "burn"
+      ],
+      "upgrade": {
+        "damage": 3
+      }
+    },
+    "guard": {
+      "char": "山",
+      "name": "固守",
+      "cost": 1,
+      "block": 7,
+      "type": "defense",
+      "art": "src/assets/tower/guard.svg",
+      "tags": [
+        "guard"
+      ],
+      "upgrade": {
+        "block": 3
+      }
+    },
+    "fire": {
+      "char": "火",
+      "name": "引燃",
+      "cost": 1,
+      "damage": 4,
+      "burn": 2,
+      "type": "technique",
+      "art": "src/assets/tower/fire.svg",
+      "tags": [
+        "burn"
+      ],
+      "upgrade": {
+        "burn": 1
+      },
+      "flameTier": 1
+    },
+    "draw": {
+      "char": "理",
+      "name": "调序",
+      "cost": 1,
+      "draw": 2,
+      "type": "technique",
+      "art": "src/assets/tower/draw.svg",
+      "tags": [
+        "cycle"
+      ],
+      "upgrade": {
+        "draw": 1
+      }
+    },
+    "stop": {
+      "char": "止",
+      "name": "压制",
+      "cost": 1,
+      "block": 4,
+      "weaken": 4,
+      "type": "defense",
+      "art": "src/assets/tower/stop.svg",
+      "tags": [
+        "guard"
+      ],
+      "upgrade": {
+        "block": 3
+      }
+    },
+    "heavy": {
+      "char": "斩",
+      "name": "断岳",
+      "cost": 2,
+      "damage": 18,
+      "type": "attack",
+      "art": "src/assets/tower/heavy.svg",
+      "tags": [
+        "charge"
+      ],
+      "upgrade": {
+        "damage": 3
+      }
+    },
+    "flame": {
+      "char": "炎",
+      "name": "炽焰",
+      "type": "technique",
+      "cost": 1,
+      "burn": 4,
+      "flameTier": 2,
+      "tags": [
+        "burn"
+      ],
+      "upgrade": {
+        "burn": 2
+      },
+      "art": "src/assets/tower/flame.svg"
+    },
+    "ember": {
+      "char": "燃",
+      "name": "余烬",
+      "type": "technique",
+      "cost": 1,
+      "burnDecay": true,
+      "exhaust": true,
+      "tags": [
+        "burn"
+      ],
+      "upgrade": {
+        "block": 3
+      },
+      "art": "src/assets/tower/ember.svg"
+    },
+    "ash": {
+      "char": "烬",
+      "name": "护烬",
+      "type": "defense",
+      "cost": 1,
+      "block": 4,
+      "burningBlock": 4,
+      "tags": [
+        "burn",
+        "guard"
+      ],
+      "upgrade": {
+        "block": 3
+      },
+      "art": "src/assets/tower/ash.svg"
+    },
+    "hold": {
+      "char": "守",
+      "name": "守势",
+      "type": "defense",
+      "cost": 1,
+      "block": 5,
+      "retainBlock": 8,
+      "tags": [
+        "guard"
+      ],
+      "upgrade": {
+        "block": 3
+      },
+      "art": "src/assets/tower/hold.svg"
+    },
+    "quake": {
+      "char": "震",
+      "name": "震岳",
+      "type": "attack",
+      "cost": 1,
+      "blockDamage": true,
+      "halveBlock": true,
+      "tags": [
+        "guard"
+      ],
+      "upgrade": {
+        "damage": 3
+      },
+      "art": "src/assets/tower/quake.svg"
+    },
+    "rock": {
+      "char": "磐",
+      "name": "磐石",
+      "type": "defense",
+      "cost": 2,
+      "block": 14,
+      "charge": 2,
+      "tags": [
+        "guard",
+        "charge"
+      ],
+      "upgrade": {
+        "block": 3
+      },
+      "art": "src/assets/tower/rock.svg"
+    },
+    "gather": {
+      "char": "聚",
+      "name": "聚势",
+      "type": "technique",
+      "cost": 1,
+      "charge": 3,
+      "draw": 1,
+      "tags": [
+        "charge"
+      ],
+      "upgrade": {
+        "charge": 1
+      },
+      "art": "src/assets/tower/gather.svg"
+    },
+    "hide": {
+      "char": "藏",
+      "name": "藏锋",
+      "type": "defense",
+      "cost": 1,
+      "block": 5,
+      "charge": 1,
+      "retain": true,
+      "tags": [
+        "charge"
+      ],
+      "upgrade": {
+        "block": 3
+      },
+      "art": "src/assets/tower/hide.svg"
+    },
+    "break": {
+      "char": "破",
+      "name": "破军",
+      "type": "attack",
+      "cost": 2,
+      "damage": 12,
+      "chargeDamage": 3,
+      "tags": [
+        "charge"
+      ],
+      "upgrade": {
+        "damage": 3
+      },
+      "art": "src/assets/tower/break.svg"
+    },
+    "guide": {
+      "char": "引",
+      "name": "引卷",
+      "type": "technique",
+      "cost": 0,
+      "scry": 3,
+      "exhaust": true,
+      "tags": [
+        "cycle"
+      ],
+      "upgrade": {
+        "scry": 2
+      },
+      "art": "src/assets/tower/guide.svg"
+    },
+    "exchange": {
+      "char": "换",
+      "name": "换墨",
+      "type": "technique",
+      "cost": 1,
+      "exchange": 2,
+      "tags": [
+        "cycle"
+      ],
+      "upgrade": {
+        "block": 3
+      },
+      "art": "src/assets/tower/exchange.svg"
+    },
+    "steady": {
+      "char": "定",
+      "name": "定心",
+      "type": "defense",
+      "cost": 1,
+      "block": 6,
+      "heavyBlock": 4,
+      "tags": [
+        "guard"
+      ],
+      "upgrade": {
+        "block": 3
+      },
+      "art": "src/assets/tower/steady.svg"
+    },
+    "qi": {
+      "char": "气",
+      "name": "凝气",
+      "type": "technique",
+      "cost": 1,
+      "charge": 2,
+      "draw": 1,
+      "tags": [
+        "charge",
+        "spiral"
+      ],
+      "upgrade": {
+        "charge": 1
+      },
+      "art": "src/assets/tower/qi.svg"
+    },
+    "spin": {
+      "char": "旋",
+      "name": "回旋",
+      "type": "attack",
+      "cost": 1,
+      "damage": 3,
+      "hits": 2,
+      "tags": [
+        "spiral"
+      ],
+      "upgrade": {
+        "damage": 1
+      },
+      "art": "src/assets/tower/spin.svg"
+    },
+    "wind": {
+      "char": "风",
+      "name": "御风",
+      "type": "defense",
+      "cost": 1,
+      "block": 5,
+      "tags": [
+        "spiral",
+        "guard"
+      ],
+      "upgrade": {
+        "block": 3
+      },
+      "art": "src/assets/tower/wind.svg"
+    },
+    "water": {
+      "char": "水",
+      "name": "润墨",
+      "type": "technique",
+      "cost": 1,
+      "damage": 3,
+      "weaken": 2,
+      "tags": [
+        "spiral",
+        "guard"
+      ],
+      "upgrade": {
+        "weaken": 2
+      },
+      "art": "src/assets/tower/water.svg"
+    }
+  },
+  "enemies": [
+    {
+      "name": "霜藤妖",
+      "hp": 25,
+      "attacks": [
+        7,
+        10,
+        6
+      ],
+      "art": "src/assets/characters/frost-vine.png"
+    },
+    {
+      "name": "寒墨妖",
+      "hp": 28,
+      "attacks": [
+        6,
+        8,
+        12
+      ],
+      "armors": [
+        5,
+        0,
+        0
+      ],
+      "art": "src/assets/tower/enemy-ink.svg"
+    },
+    {
+      "name": "碑蛀",
+      "hp": 32,
+      "attacks": [
+        0,
+        15,
+        7
+      ],
+      "art": "src/assets/tower/enemy-beetle.svg"
+    }
+  ],
+  "scaling": {
+    "hpPerFloor": 3,
+    "attackPerFloor": 1,
+    "eliteHp": 12,
+    "eliteAttack": 3
+  },
+  "boss": {
+    "name": "镇塔墨魇",
+    "hp": 72,
+    "attacks": [
+      14,
+      18,
+      10
+    ]
+  },
+  "starterDeck": {
+    "name": "初行 · 火刀",
+    "description": "先以山守势，再用火留下灼痕，接刀引爆；理帮助寻找关键字卡。",
+    "strategy": [
+      "山：观察敌方意图，格挡只保留到本回合结束。",
+      "火 → 刀：先施加灼痕，再引爆，每层灼痕额外造成2伤害。",
+      "理：抽2张牌，但需要1文气；留出费用打出抽到的牌。"
+    ]
+  },
+  "cardTypes": {
+    "attack": {
+      "name": "攻击",
+      "description": "直接造成伤害，负责击败妖物。"
+    },
+    "defense": {
+      "name": "防守",
+      "description": "获得格挡或压制敌方攻击，减少本回合伤害。"
+    },
+    "technique": {
+      "name": "术法",
+      "description": "抽牌、施加状态与调整资源，连接牌组联动。"
+    },
+    "summon": {
+      "name": "召唤",
+      "description": "后续开放：唤出持续作战的字灵。"
+    }
+  },
+  "rulesVersion": 2,
+  "contentVersion": "tower-2.0",
+  "limits": {
+    "charge": 9,
+    "marks": 3,
+    "fusions": 2,
+    "releases": 1,
+    "minimumDeck": 8
+  },
+  "rewardPool": [
+    "fire",
+    "draw",
+    "stop",
+    "heavy",
+    "flame",
+    "ember",
+    "ash",
+    "hold",
+    "quake",
+    "rock",
+    "gather",
+    "hide",
+    "break",
+    "guide",
+    "exchange",
+    "steady",
+    "qi",
+    "spin",
+    "wind",
+    "water"
+  ],
+  "relics": {
+    "cinnabar": {
+      "name": "朱砂砚",
+      "description": "每回合首次施加灼痕，额外施加1层。",
+      "art": "src/assets/tower/relic-cinnabar.svg"
+    },
+    "emberLamp": {
+      "name": "余烬灯",
+      "description": "每战首次引爆后，敌人存活则重新施加2灼痕。",
+      "art": "src/assets/tower/relic-emberLamp.svg"
+    },
+    "paperweight": {
+      "name": "镇纸",
+      "description": "每战第一回合获得5格挡。",
+      "art": "src/assets/tower/relic-paperweight.svg"
+    },
+    "rubbing": {
+      "name": "碑拓",
+      "description": "每回合完全挡住一次正伤害攻击后，获得1蓄势。",
+      "art": "src/assets/tower/relic-rubbing.svg"
+    },
+    "bladeCase": {
+      "name": "藏锋匣",
+      "description": "每战首次打出2费攻击后，抽1张。",
+      "art": "src/assets/tower/relic-bladeCase.svg"
+    },
+    "bookmark": {
+      "name": "旧书签",
+      "description": "每战首次洗回弃牌堆时，额外抽1张。",
+      "art": "src/assets/tower/relic-bookmark.svg"
+    }
+  },
+  "recipes": {
+    "lotus": {
+      "name": "两仪焰莲",
+      "materials": [
+        "fire",
+        "flame"
+      ],
+      "cost": 0,
+      "consumeBurn": 4,
+      "burnDamage": 2,
+      "description": "消耗至多4灼痕，每层造成2伤害。",
+      "differentFlameTiers": true,
+      "art": "src/assets/tower/skill-lotus.svg"
+    },
+    "twin": {
+      "name": "双炬",
+      "materials": [
+        "fire",
+        "fire"
+      ],
+      "cost": 0,
+      "burn": 2,
+      "description": "施加2灼痕。",
+      "art": "src/assets/tower/skill-twin.svg"
+    },
+    "seal": {
+      "name": "封山印",
+      "materials": [
+        "guard",
+        "stop"
+      ],
+      "cost": 0,
+      "retainBlock": 4,
+      "description": "下一回合开始保留至多4格挡。",
+      "art": "src/assets/tower/skill-seal.svg"
+    },
+    "wave": {
+      "name": "镇岳波",
+      "materials": [
+        "guard",
+        "quake"
+      ],
+      "cost": 0,
+      "block": 4,
+      "description": "获得4格挡。",
+      "art": "src/assets/tower/skill-wave.svg"
+    },
+    "hiddenSlash": {
+      "name": "藏锋斩",
+      "materials": [
+        "gather",
+        "heavy"
+      ],
+      "cost": 0,
+      "consumeCharge": 2,
+      "chargeDamage": 3,
+      "description": "消耗至多2蓄势，每点造成3伤害。",
+      "art": "src/assets/tower/skill-hiddenSlash.svg"
+    },
+    "lava": {
+      "name": "熔岩甲",
+      "materials": [
+        "fire",
+        "guard"
+      ],
+      "cost": 0,
+      "block": 3,
+      "burn": 1,
+      "description": "获得3格挡，施加1灼痕。",
+      "art": "src/assets/tower/skill-lava.svg"
+    },
+    "bladeWard": {
+      "name": "悬刃卫",
+      "materials": [
+        "stop",
+        "blade"
+      ],
+      "cost": 0,
+      "block": 4,
+      "description": "获得4格挡。",
+      "art": "src/assets/tower/skill-bladeWard.svg"
+    },
+    "breath": {
+      "name": "调息印",
+      "materials": [
+        "draw",
+        "gather"
+      ],
+      "cost": 0,
+      "charge": 1,
+      "description": "获得1蓄势。",
+      "art": "src/assets/tower/skill-breath.svg"
+    },
+    "orb": {
+      "name": "气旋丸",
+      "materials": [
+        "qi",
+        "spin"
+      ],
+      "cost": 0,
+      "damage": 5,
+      "description": "造成5伤害；可接风、火或山进阶。",
+      "art": "src/assets/tower/skill-orb.svg"
+    },
+    "windBlade": {
+      "name": "风轮刃",
+      "materials": [
+        "wind"
+      ],
+      "cost": 0,
+      "damage": 9,
+      "description": "造成9伤害；可接火进阶。",
+      "from": "orb",
+      "art": "src/assets/tower/skill-windBlade.svg"
+    },
+    "fireOrb": {
+      "name": "赤焰丸",
+      "materials": [
+        "fire"
+      ],
+      "cost": 0,
+      "damage": 4,
+      "burn": 2,
+      "description": "造成4伤害，施加2灼痕。",
+      "from": "orb",
+      "art": "src/assets/tower/skill-fireOrb.svg"
+    },
+    "mountainOrb": {
+      "name": "镇岳丸",
+      "materials": [
+        "guard"
+      ],
+      "cost": 0,
+      "damage": 3,
+      "block": 6,
+      "description": "造成3伤害，获得6格挡。",
+      "from": "orb",
+      "art": "src/assets/tower/skill-mountainOrb.svg"
+    },
+    "flameWheel": {
+      "name": "焰风轮",
+      "materials": [
+        "fire"
+      ],
+      "cost": 1,
+      "damage": 10,
+      "burn": 3,
+      "description": "造成10伤害，施加3灼痕。",
+      "from": "windBlade",
+      "art": "src/assets/tower/skill-flameWheel.svg"
+    },
+    "boomerang": {
+      "name": "回旋刃",
+      "materials": [
+        "blade",
+        "spin"
+      ],
+      "cost": 0,
+      "damage": 4,
+      "description": "造成4伤害。",
+      "art": "src/assets/tower/skill-boomerang.svg"
+    },
+    "fireSpin": {
+      "name": "焰旋",
+      "materials": [
+        "fire",
+        "spin"
+      ],
+      "cost": 0,
+      "damage": 2,
+      "burn": 2,
+      "description": "造成2伤害，施加2灼痕。",
+      "art": "src/assets/tower/skill-fireSpin.svg"
+    },
+    "vortex": {
+      "name": "涡流",
+      "materials": [
+        "water",
+        "spin"
+      ],
+      "cost": 0,
+      "block": 4,
+      "weaken": 2,
+      "description": "获得4格挡，本回合敌方攻击-2。",
+      "art": "src/assets/tower/skill-vortex.svg"
+    },
+    "mist": {
+      "name": "雾幕",
+      "materials": [
+        "water",
+        "fire"
+      ],
+      "cost": 0,
+      "block": 6,
+      "description": "获得6格挡。",
+      "art": "src/assets/tower/skill-mist.svg"
+    }
+  },
+  "bosses": [
+    {
+      "name": "镇塔墨魇",
+      "hp": 72,
+      "attacks": [
+        12,
+        0,
+        18
+      ],
+      "armors": [
+        0,
+        9,
+        0
+      ],
+      "art": "src/assets/tower/enemy-ink.svg"
+    },
+    {
+      "name": "裂碑巨像",
+      "hp": 78,
+      "attacks": [
+        0,
+        20,
+        9
+      ],
+      "armors": [
+        6,
+        0,
+        0
+      ],
+      "art": "src/assets/tower/enemy-colossus.svg"
+    }
+  ],
+  "routeSchedule": [
+    [
+      "battle"
+    ],
+    [
+      "battle",
+      "elite"
+    ],
+    [
+      "rest",
+      "battle"
+    ],
+    [
+      "treasure"
+    ],
+    [
+      "battle",
+      "elite"
+    ],
+    [
+      "rest",
+      "battle"
+    ],
+    [
+      "battle",
+      "elite"
+    ],
+    [
+      "rest",
+      "battle"
+    ],
+    [
+      "boss"
+    ]
+  ],
+  "presets": {
+    "beginner": {
+      "name": "初行 · 火刀",
+      "description": "先以山守势，再用火留下灼痕，接刀引爆；理帮助寻找关键字卡。",
+      "strategy": [
+        "山：观察敌方意图，格挡只保留到本回合结束。",
+        "火 → 刀：先施加灼痕，再引爆，每层灼痕额外造成2伤害。",
+        "理：抽2张牌，但需要1文气；留出费用打出抽到的牌。"
+      ],
+      "cards": [
+        "blade",
+        "blade",
+        "blade",
+        "blade",
+        "guard",
+        "guard",
+        "guard",
+        "guard",
+        "fire",
+        "draw"
+      ]
+    },
+    "mountain": {
+      "name": "山岳 · 守而后震",
+      "description": "守势留下格挡，震将格挡化为伤害；山与止还能凝成封山印。",
+      "cards": [
+        "blade",
+        "blade",
+        "guard",
+        "guard",
+        "guard",
+        "stop",
+        "hold",
+        "quake",
+        "draw",
+        "gather"
+      ],
+      "strategy": [
+        "山 → 守 → 震：格挡可以变成进攻，但会损失一半保护。",
+        "山＋止：封山印只保留反击后剩余格挡。",
+        "先观察意图，重击回合可以放弃震岳，专注防守。"
+      ]
+    },
+    "charge": {
+      "name": "藏锋 · 蓄势破军",
+      "description": "聚与藏积攒蓄势，破消耗资源重击；蓄势可以跨回合保存。",
+      "cards": [
+        "blade",
+        "blade",
+        "blade",
+        "guard",
+        "guard",
+        "guard",
+        "draw",
+        "gather",
+        "hide",
+        "break"
+      ],
+      "strategy": [
+        "聚获得3蓄势并抽1张，藏帮助保护准备回合。",
+        "破消耗全部蓄势，每点追加3伤害。",
+        "蓄势上限9，准备过久可能失去生命，适时释放。"
+      ]
+    },
+    "spiral": {
+      "name": "气旋 · 借风成刃",
+      "description": "气与旋凝成气旋丸，保留术式，再借风进阶为风轮刃。",
+      "cards": [
+        "blade",
+        "blade",
+        "blade",
+        "guard",
+        "guard",
+        "guard",
+        "draw",
+        "qi",
+        "spin",
+        "wind"
+      ],
+      "strategy": [
+        "气＋旋：凝成气旋丸，0文气释放5伤害。",
+        "气旋丸＋风：替换为风轮刃，0文气释放9伤害。",
+        "进阶继承到期回合；风不在手上时，可先放丸，也可等待下一回合。"
+      ]
+    }
+  }
+}

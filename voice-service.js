@@ -6,9 +6,9 @@ import path from 'node:path';
 
 const CACHE_VERSION = 'kokoro-v1.1-zh-v2';
 const VOICES = {
-  hero: { sid: 58, speed: 1 },
-  mentor: { sid: 65, speed: 1.14 },
-  enemy: { sid: 78, speed: 0.95 },
+  hero: { sid: 58, speed: 1.08 },
+  mentor: { sid: 65, speed: 1.2 },
+  enemy: { sid: 78, speed: 1.06 },
 };
 
 export function normalizeSpeechText(text) {
