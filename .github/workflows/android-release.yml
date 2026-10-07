@@ -1,0 +1,69 @@
+name: Android Release
+on:
+  workflow_dispatch:
+    inputs:
+      version_name:
+        description: 安卓版本名称
+        required: true
+        default: '0.1.0'
+      version_code:
+        description: 安卓递增版本号
+        required: true
+        default: '1'
+  push:
+    tags: ['android-v*']
+permissions:
+  contents: write
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: 校验游戏规则
+        run: npm test
+      - name: 打包离线游戏
+        run: node scripts/package-android.mjs
+      - name: 构建固定签名安装包
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          INPUT_NAME: ${{ inputs.version_name }}
+          INPUT_CODE: ${{ inputs.version_code }}
+        run: |
+          set -euo pipefail
+          test -n "$KEYSTORE_BASE64"
+          export ANDROID_KEYSTORE="$RUNNER_TEMP/hanzi.jks"
+          printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$ANDROID_KEYSTORE"
+          if [[ "$GITHUB_REF" == refs/tags/android-v* ]]; then
+            export ANDROID_VERSION_NAME="${GITHUB_REF_NAME#android-v}"
+            export ANDROID_VERSION_CODE="$(node -p "JSON.parse(require('fs').readFileSync('android/version.json')).versionCode")"
+          else
+            export ANDROID_VERSION_NAME="$INPUT_NAME"
+            export ANDROID_VERSION_CODE="$INPUT_CODE"
+          fi
+          gradle -p android --no-daemon assembleRelease
+          mkdir -p dist/android
+          cp android/app/build/outputs/apk/release/app-release.apk dist/android/GodOfHanzi.apk
+          node --input-type=module -e "import fs from 'node:fs'; import crypto from 'node:crypto'; const sha256=crypto.createHash('sha256').update(fs.readFileSync('dist/android/GodOfHanzi.apk')).digest('hex'); fs.writeFileSync('dist/android/android-update.json',JSON.stringify({versionCode:Number(process.env.ANDROID_VERSION_CODE),versionName:process.env.ANDROID_VERSION_NAME,sha256},null,2));"
+          rm "$ANDROID_KEYSTORE"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-release
+          path: dist/android/*
+      - name: 发布安卓版本
+        if: startsWith(github.ref, 'refs/tags/android-v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/android/* --title "汉字成圣 安卓 ${GITHUB_REF_NAME#android-v}" --notes "安卓离线爬塔版本；启动自动检查并下载更新，安装需系统确认。覆盖安装保留本地存档。支持 Android 9 及以上。"

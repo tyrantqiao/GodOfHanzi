@@ -1,0 +1,21 @@
+#!/bin/sh
+# Pre-commit hook: block the commit unless the unit test suite passes.
+#
+# Wired with Git's native hooks path (no extra dependency):
+#   git config core.hooksPath .githooks
+# The root "prepare" npm script runs that command automatically after install.
+#
+# Bypass in an emergency with: git commit --no-verify
+set -e
+
+echo "[pre-commit] 运行单元测试：npm test ..."
+
+# Always run from the repository root so relative paths resolve consistently.
+cd "$(git rev-parse --show-toplevel)"
+
+if ! npm test; then
+  echo "[pre-commit] ✗ 单元测试未通过，已阻止提交。修复后重试，或使用 'git commit --no-verify' 强制跳过。"
+  exit 1
+fi
+
+echo "[pre-commit] ✓ 单元测试通过，继续提交。"

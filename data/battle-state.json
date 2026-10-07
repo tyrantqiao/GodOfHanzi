@@ -1,6 +1,10 @@
 {
   "chapter": "第一卷 · 雪林醒魂",
   "objective": "目标：击退霜藤妖",
+  "writingDifficulty": "tutorial",
+  "tutorialIntro": true,
+  "tutorialOmenShown": false,
+  "tutorialFirstPerfectShown": false,
   "party": [
     {
       "id": "shen_yan",
@@ -9,13 +13,13 @@
       "grade": 9,
       "realm": "开窍境",
       "level": 1,
-      "hp": 320,
+      "hp": 280,
       "maxHp": 320,
       "spirit": 100,
       "maxSpirit": 100,
       "attack": 32,
       "defense": 8,
-      "states": ["气", "墨", "守"]
+      "states": ["气", "墨", "寒蚀"]
     },
     {
       "id": "lu_qingya",

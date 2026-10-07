@@ -19,21 +19,28 @@ function unlock() {
     highpass.frequency.value = 90;
     highpass.Q.value = 0.7;
 
+    const mudCut = context.createBiquadFilter();
+    mudCut.type = 'peaking';
+    mudCut.frequency.value = 340;
+    mudCut.Q.value = 1;
+    mudCut.gain.value = -2.5;
+
     const presence = context.createBiquadFilter();
     presence.type = 'peaking';
-    presence.frequency.value = 2800;
-    presence.Q.value = 0.9;
-    presence.gain.value = 2.5;
+    presence.frequency.value = 3200;
+    presence.Q.value = 1;
+    presence.gain.value = 2.2;
 
     const compressor = context.createDynamicsCompressor();
-    compressor.threshold.value = -24;
-    compressor.knee.value = 18;
-    compressor.ratio.value = 3;
-    compressor.attack.value = 0.003;
-    compressor.release.value = 0.18;
+    compressor.threshold.value = -14;
+    compressor.knee.value = 8;
+    compressor.ratio.value = 1.8;
+    compressor.attack.value = 0.012;
+    compressor.release.value = 0.1;
 
     gain = context.createGain();
-    highpass.connect(presence);
+    highpass.connect(mudCut);
+    mudCut.connect(presence);
     presence.connect(compressor);
     compressor.connect(gain);
     gain.connect(context.destination);
@@ -83,7 +90,7 @@ export function speak(text, role = 'mentor', { interrupt = false, deduplicate = 
     const playing = context.createBufferSource();
     playing.buffer = buffer;
     if (voiceGraph) {
-      voiceGraph.presence.gain.value = role === 'mentor' ? 3.5 : 2.5;
+      voiceGraph.presence.gain.value = role === 'mentor' ? 2.6 : 2.2;
       playing.connect(voiceGraph.highpass);
     } else {
       playing.connect(gain);
@@ -115,7 +122,7 @@ document.querySelector('#voice-preview').addEventListener('click', () => {
   toggle.checked = true;
   unlock();
   speak('师父，我准备好了。', 'hero', { interrupt: true });
-  speak('好，先从一横开始。落笔要稳，空处留白。');
+  speak('先写火，点燃霜藤。再写刀，借火斩藤。');
 });
 document.querySelector('#voice-stop').addEventListener('click', () => {
   stopVoice(); status.textContent = enabled ? '语音已开启' : '语音已关闭';

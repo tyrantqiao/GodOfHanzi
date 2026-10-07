@@ -1,0 +1,171 @@
+{
+  "cards": {
+    "mentorFire": {
+      "char": "火",
+      "name": "借火破霜",
+      "cost": 1,
+      "damage": 6,
+      "burn": 2,
+      "oneShot": true,
+      "retain": true,
+      "text": "造成6伤害，施加2灼痕。赠卡仅能用一次，用后燃尽。",
+      "art": "cinnabar-flame.svg",
+      "inkAsset": "mentor-fire-ink.svg",
+      "faceArt": "fire-united.png"
+    },
+    "mentorBlade": {
+      "char": "刀",
+      "name": "借刀断藤",
+      "cost": 2,
+      "damage": 8,
+      "detonate": true,
+      "oneShot": true,
+      "retain": true,
+      "text": "造成8伤害，引爆灼痕，每层额外2伤害。赠卡仅能用一次。",
+      "art": "summoned-blade.svg",
+      "inkAsset": "mentor-blade-ink.svg",
+      "faceArt": "martial-battlefield.png"
+    },
+    "ownFire": {
+      "char": "火",
+      "name": "朱砂引燃",
+      "cost": 1,
+      "damage": 4,
+      "burn": 2,
+      "retain": true,
+      "upgrade": {
+        "damage": 2,
+        "burn": 1
+      },
+      "text": "造成4伤害，施加2灼痕。可反复抽到；未使用时保留。",
+      "art": "cinnabar-flame.svg",
+      "faceArt": "fire-torch.png",
+      "faceArtByStar": {
+        "2": "fire-violet.png"
+      }
+    },
+    "ownBlade": {
+      "char": "刀",
+      "name": "松烟斩势",
+      "cost": 2,
+      "damage": 7,
+      "detonate": true,
+      "retain": true,
+      "upgrade": {
+        "damage": 3
+      },
+      "text": "造成7伤害，引爆全部灼痕，每层额外2伤害。可反复抽到；未使用时保留。",
+      "art": "summoned-blade.svg",
+      "faceArt": "martial-bamboo-blades.png"
+    }
+  },
+  "enemies": [
+    {
+      "name": "缠身霜藤",
+      "hp": 18,
+      "attacks": [
+        0
+      ],
+      "intro": "这两张卡是老夫亲手所制，笔迹已封入卡中。先借「火」点燃霜藤，再借「刀」断开束缚；用后卡纸就会燃尽。"
+    },
+    {
+      "name": "残碑藤妖",
+      "hp": 30,
+      "attacks": [
+        6,
+        8,
+        10
+      ],
+      "intro": "现在手中是你亲笔写成的两张卡。先火后刀可引爆灼痕；用过的自制卡会重新洗入牌堆。"
+    }
+  ],
+  "recipes": [
+    {
+      "id": "ownFire",
+      "name": "薄纸 · 朱砂墨",
+      "char": "火",
+      "paper": "thin",
+      "ink": "cinnabar",
+      "description": "第一张：写「火」。长者护持墨路，认真落笔即可完美成卡。",
+      "timeLimit": 35,
+      "tutorialBonus": 10
+    },
+    {
+      "id": "ownBlade",
+      "name": "韧纸 · 松烟墨",
+      "char": "刀",
+      "paper": "tough",
+      "ink": "pine",
+      "description": "第二张：写「刀」。让笔势相接，制成自己的斩击卡。",
+      "timeLimit": 25,
+      "tutorialBonus": 10
+    }
+  ],
+  "ranks": [
+    {
+      "star": 1,
+      "name": "字形",
+      "description": "基础单字术法，新手完美制卡为一星。"
+    },
+    {
+      "star": 2,
+      "name": "笔势",
+      "description": "加入笔势变化；本关行草试炼达标可制成二星。"
+    },
+    {
+      "star": 3,
+      "name": "复纹",
+      "description": "复合构纹与状态联动；长者赠卡展示三星封存术法。"
+    },
+    {
+      "star": 4,
+      "name": "成词",
+      "description": "设计方向：字词组合、多个效果相互制约。"
+    },
+    {
+      "star": 5,
+      "name": "立意",
+      "description": "设计方向：诗文意境与流派核心。"
+    },
+    {
+      "star": 6,
+      "name": "成章",
+      "description": "设计方向：持续战场规则与篇章体系。"
+    },
+    {
+      "star": 7,
+      "name": "传道",
+      "description": "设计方向：独有传承与圣人遗卡。"
+    }
+  ],
+  "freehandTemplates": {
+    "火": [
+      {
+        "path": "M112 157Q146 160 144 194",
+        "width": 17
+      },
+      {
+        "path": "M294 133Q272 174 243 179",
+        "width": 17
+      },
+      {
+        "path": "M208 76Q247 174 183 245Q152 291 84 319",
+        "width": 22
+      },
+      {
+        "path": "M205 196Q230 272 316 308Q278 329 253 317",
+        "width": 19
+      }
+    ],
+    "刀": [
+      {
+        "path": "M102 129Q176 128 251 100Q300 109 281 171Q270 240 234 297Q218 311 191 278",
+        "width": 21
+      },
+      {
+        "path": "M198 143Q201 233 101 308Q83 324 71 320",
+        "width": 24
+      }
+    ]
+  }
+}

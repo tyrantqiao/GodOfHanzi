@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+  <g fill="none" stroke="#726951" stroke-opacity=".07" stroke-width=".6">
+    <path d="M4 19l13 2m26 15l21-1m34-24l18 2m21 27l16-2M12 71l19-2m29 15l13 2m35-21l21 1M5 129l24 1m16-19l18 2m27 25l21-1m24-26l19 2M21 44l-2 8m69-21l1 11m48 29l-1 13M39 94l1 13m39 13l-1 7m46 12l1 10"/>
+  </g>
+  <g fill="#776c53" fill-opacity=".065"><circle cx="30" cy="28" r=".7"/><circle cx="93" cy="82" r=".8"/><circle cx="15" cy="109" r=".6"/><circle cx="146" cy="145" r=".8"/><circle cx="71" cy="152" r=".6"/></g>
+</svg>

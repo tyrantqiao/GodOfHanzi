@@ -1,36 +1,79 @@
 import { loadLocalSave, loadServerSave, saveLocal, saveServer } from "./storage.js";
-import { scoreWriting } from './writing-score.js';
+import { getWritingScoreRules, scoreWriting } from './writing-score.js';
 import { speak, stopVoice } from './voice.js';
+import { playCue } from './sfx.js';
+import { clamp, percent, gradeText, calculateDamage, skillAppliesState, skillConsumesState, normalizeBattleState, getBattleResult } from './battle.js';
 
 const fallbackSkills = [
   {
+    id: "dao",
+    char: "火",
+    title: "火字破霜",
+    shortName: "火字破霜",
+    text: "写火点燃霜藤，笔力达到25%便留下灼痕；接「刀」可引爆焰刃。",
+    tags: ["引燃", "连招起手", "克霜"],
+    preview: "引燃目标",
+    action: "确认书写",
+    spiritCost: 5,
+    basePower: 22,
+    target: "enemy",
+    effect: "damage",
+    appliesState: "灼痕",
+    applyThreshold: 0.25,
+    requiresWriting: true,
+    previewVisible: true,
+  },
+  {
     id: "zhan",
     char: "刀",
-    title: "墨刀",
-    text: "凝字为刃，对霜藤妖造成斩击伤害。",
-    tags: ["攻击", "克藤", "需书写"],
-    preview: "斩击预览",
+    title: "焰刃斩藤",
+    shortName: "焰刃斩藤",
+    text: "以字化刀斩断霜藤；若目标带有灼痕，消耗灼痕并造成1.6倍伤害。",
+    tags: ["爆发", "火刀连招", "克藤"],
+    preview: "焰刃预览",
     action: "确认书写",
     spiritCost: 8,
     basePower: 46,
     target: "enemy",
     effect: "damage",
+    consumesState: "灼痕",
+    comboMultiplier: 1.6,
+    requiresWriting: true,
+    previewVisible: true,
+  },
+  {
+    id: "jing",
+    char: "生",
+    title: "生息回春",
+    shortName: "生息回春",
+    text: "写生恢复生命；笔力达到50%还能驱散寒蚀、恐惧，并压下妖物狂暴。",
+    tags: ["救场", "回血", "净化"],
+    preview: "回春目标",
+    action: "确认书写",
+    spiritCost: 6,
+    basePower: 36,
+    target: "ally",
+    effect: "cleanse",
+    requiresWriting: true,
+    previewVisible: false,
+  },
+  {
+    id: "ding",
+    char: "止",
+    title: "止妖一息",
+    shortName: "止妖一息",
+    text: "写止封住妖势；笔力达到50%，霜藤妖便跳过下一次反击，为连招争取一笔。",
+    tags: ["停手", "控场", "争取一笔"],
+    preview: "定身目标",
+    action: "确认书写",
+    spiritCost: 7,
+    basePower: 28,
+    target: "enemy",
+    effect: "control",
     requiresWriting: true,
     previewVisible: true,
   },
 ];
-
-const gradeLabels = {
-  1: "一品",
-  2: "二品",
-  3: "三品",
-  4: "四品",
-  5: "五品",
-  6: "六品",
-  7: "七品",
-  8: "八品",
-  9: "九品",
-};
 
 const cards = document.querySelectorAll(".skill-card");
 const characterCards = document.querySelectorAll(".status-card");
@@ -40,8 +83,6 @@ const infoTitle = document.querySelector(".info-title");
 const infoText = document.querySelector(".info-text");
 const infoTags = document.querySelector(".info-tags");
 const castButton = document.querySelector(".cast-button");
-const previewLabel = document.querySelector(".preview-label");
-const previewLayer = document.querySelector(".preview-layer");
 const saveButton = document.querySelector(".save-button");
 const loadButton = document.querySelector(".load-button");
 const saveStatus = document.querySelector(".save-status");
@@ -49,7 +90,14 @@ const combatLog = document.querySelector(".combat-log");
 const enemyPanel = document.querySelector(".enemy-panel");
 const mentorBubble = document.querySelector(".mentor-bubble");
 const mentorLine = mentorBubble?.querySelector("p");
+const mentorTipTrigger = document.querySelector('.mentor-tip-trigger');
 const writingGuide = document.querySelector(".writing-guide");
+const writingInkGlow = {
+  dao: '#a15c43',
+  zhan: '#657568',
+  jing: '#83dca2',
+  ding: '#7fd7ce',
+};
 
 let skillData = {};
 let battleState = null;
@@ -65,18 +113,28 @@ const restButton = document.querySelector('#rest-button');
 const writingDialog = document.querySelector('#writing-dialog');
 const menuDialog = document.querySelector('#menu-dialog');
 const resultDialog = document.querySelector('#result-dialog');
+const openingSequence = document.querySelector('#opening-sequence');
+const openingLine = document.querySelector('#opening-line');
+const openingDetail = document.querySelector('#opening-detail');
+const battleOmen = document.querySelector('.battle-omen');
+let openingActive = false;
+let openingTimers = [];
+let omenTimer = null;
+let resultTimer = null;
+let mentorTipTimer = null;
+let lastMentorTip = { message: mentorLine?.textContent || '先选一枚汉字，再凝神书写。', tone: 'guide' };
 
 const mentorSkillTips = {
-  dao: "先从「一」试起：选字牌后点开始书写，照着淡墨横线稳稳走完一笔。",
-  zhan: "「刀」是主攻字。笔画越贴近字形，斩击越重，专破霜藤妖的妖躯。",
-  jing: "「人」可温养自身。写得过半，回血之外还能净化寒蚀与恐惧。",
-  ding: "「止」能封住妖势。书写威力达到50%，霜藤妖就会跳过一次反击。",
+  dao: "先写「火」点燃霜藤；留下灼痕后，再写「刀」就能打出焰刃连击。",
+  zhan: "霜藤带灼痕时写「刀」，可引爆火势，伤害变为1.6倍。也可让师父接这一刀。",
+  jing: "「生」能救场：回血之外，笔力过半可洗去寒蚀，还能压下狂暴。",
+  ding: "「止」能截断反击，为火接刀的连招争取下一笔。笔力达到50%即可。",
 };
 
 const writingGuides = {
-  dao: "一横求稳不求快：贴着淡墨横线走，少抖、少偏、不要反复涂厚。",
-  zhan: "写「刀」时先顾字形，再顾速度。覆盖淡墨笔画，同时别把空白处涂满。",
-  jing: "写「人」要让两笔立住。贴合淡墨，空处留白，笔力才会回到自己身上。",
+  dao: "写「火」先顺着四处淡墨落笔；不必贪快，火星成形就能点燃霜藤。",
+  zhan: "写「刀」时先顾字形，再顾速度。目标有灼痕，这一刀便会引爆火势。",
+  jing: "写「生」要让横竖站稳。贴合淡墨、空处留白，生机才会回到身上。",
   ding: "写「止」要收住笔势。威力过半即可定身，覆盖和准确越高越稳。",
 };
 
@@ -100,19 +158,6 @@ function clone(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
-function clamp(value, min, max) {
-  return Math.max(min, Math.min(max, value));
-}
-
-function gradeText(entity) {
-  return `${gradeLabels[entity.grade] || `${entity.grade}品`} · ${entity.realm}`;
-}
-
-function percent(current, max) {
-  if (!max) return 0;
-  return clamp((current / max) * 100, 0, 100);
-}
-
 function setSaveStatus(message) {
   saveStatus.textContent = `存档：${message}`;
 }
@@ -121,20 +166,43 @@ function setLog(message) {
   combatLog.textContent = `战斗记录：${message}`;
 }
 
-function setMentorTip(message, tone = 'guide', appendVoice = false) {
+function hideMentorTip() {
+  if (!mentorBubble) return;
+  clearTimeout(mentorTipTimer);
+  mentorBubble.hidden = true;
+  mentorTipTrigger?.setAttribute('aria-expanded', 'false');
+  if (mentorBubble.contains(document.activeElement)) mentorTipTrigger?.focus();
+}
+
+function setMentorTip(message, tone = 'guide', appendVoice = false, voiceText = message) {
   if (!mentorBubble || !mentorLine) return;
+  lastMentorTip = { message, tone };
   mentorLine.textContent = message;
-  speak(message, 'mentor', { interrupt: !appendVoice, deduplicate: true });
+  mentorBubble.hidden = false;
+  mentorTipTrigger?.setAttribute('aria-expanded', 'true');
+  if (voiceText) speak(voiceText, 'mentor', { interrupt: !appendVoice, deduplicate: true });
   mentorBubble.classList.remove('guide', 'praise', 'warn');
   mentorBubble.classList.add(tone);
   mentorBubble.style.animation = 'none';
   void mentorBubble.offsetWidth;
   mentorBubble.style.animation = '';
+  clearTimeout(mentorTipTimer);
+  mentorTipTimer = setTimeout(hideMentorTip, Math.min(8500, Math.max(4500, 2200 + message.length * 65)));
 }
+
+mentorTipTrigger?.addEventListener('click', () => {
+  if (mentorBubble.hidden) setMentorTip(lastMentorTip.message, lastMentorTip.tone, false, '');
+  else hideMentorTip();
+});
+mentorBubble?.querySelector('.mentor-tip-close')?.addEventListener('click', hideMentorTip);
 
 function setWritingGuide(skill) {
   if (!writingGuide) return;
-  writingGuide.textContent = `${writingGuides[skill.id] || '沿淡墨字形下笔，尽量覆盖该覆盖的笔画，避开空白处。'} 覆盖率和准确率都达到90%，就会判定为完美书写。`;
+  const rules = getWritingScoreRules(battleState?.writingDifficulty);
+  const coverage = Math.round(rules.perfectCoverage * 100);
+  const precision = Math.round(rules.perfectPrecision * 100);
+  const tutorialHint = battleState?.writingDifficulty === 'tutorial' ? '本关师父借你文气，' : '';
+  writingGuide.textContent = `${writingGuides[skill.id] || '沿淡墨字形下笔，尽量覆盖该覆盖的笔画，避开空白处。'} ${tutorialHint}覆盖率达到${coverage}%、准确率达到${precision}%，就会触发完美术法。`;
 }
 
 function getActor(id = selectedCharacter) {
@@ -178,12 +246,18 @@ function renderEnemy() {
   enemyPanel.querySelector(".enemy-realm").textContent = gradeText(enemy);
   renderBar(enemyPanel.querySelector(".enemy-hp"), enemy.hp, enemy.maxHp);
   renderBar(enemyPanel.querySelector(".enemy-spirit"), enemy.spirit, enemy.maxSpirit);
+  const status = enemyPanel.querySelector('.enemy-combo-status');
+  const marked = enemy.states.includes('灼痕');
+  status.hidden = !marked;
+  status.textContent = marked ? '灼痕已成 · 接「刀」伤害 ×1.6' : '';
 }
 
 function renderBattleMeta() {
   chapter.textContent = battleState.chapter;
   objective.textContent = battleState.objective;
   document.querySelector('#turn-label').textContent = battleEnded ? '战斗结束' : `第 ${battleState.turn.round} 回合 · ${battleState.turn.side === 'player' ? '我方行动' : '敌方行动'}`;
+  document.querySelector('#replay-opening').disabled = !battleState.tutorialIntro || battleEnded || battleState.turn.side !== 'player';
+  document.querySelector('.battlefield').classList.toggle('omen-awake', Boolean(battleState.tutorialOmenShown));
 }
 
 function renderAll() {
@@ -202,7 +276,7 @@ function renderTags(tags) {
   );
 }
 
-function showSkillInfo(skillId = selectedSkill) {
+function showSkillInfo(skillId = selectedSkill, showTip = false) {
   const skill = skillData[skillId];
   if (!skill) return;
   const actor = getActor();
@@ -215,17 +289,16 @@ function showSkillInfo(skillId = selectedSkill) {
   infoText.textContent = `${skill.text} 消耗精神 ${skill.spiritCost}，基础威力 ${skill.basePower}。施法者：${actor.name}。`;
   const reason = battleEnded ? '战斗结束' : battleState.turn.side !== 'player' ? '敌方行动中' : actor.hp <= 0 ? '已倒下' : '精神不足';
   renderTags([...skill.tags, canCast ? "可释放" : reason]);
-  castButton.textContent = canCast ? (skill.requiresWriting ? '开始书写' : '释放墨刀') : reason;
+  castButton.textContent = canCast ? (skill.requiresWriting ? '开始书写' : '释放术法') : reason;
   castButton.disabled = !canCast;
-  previewLabel.textContent = skill.effect === 'damage' ? `预计伤害 ${skill.requiresWriting ? '0–' : ''}${calculateDamage(actor, skill)}` : skill.effect === 'control' ? '威力≥50% · 定身一回合' : `净化目标：${actor.name}`;
-  previewLayer.classList.toggle("hidden", !skill.previewVisible);
   document.querySelector('.enemy').classList.toggle('targeted', skill.target === 'enemy' && !battleEnded);
-  if (battleState.turn.side === 'player' && !battleEnded && !writingDialog.open) {
-    setMentorTip(mentorSkillTips[skill.id] || "先看汉字牌的效果，再选择施法者。精神足够时，就可以开始书写。", 'guide', true);
+  if (showTip && battleState.turn.side === 'player' && !battleEnded && !writingDialog.open) {
+    const comboHint = battleState.enemy.states.includes('灼痕') ? '火已咬住霜藤！现在写「刀」引爆灼痕，或让师父接这一刀。' : null;
+    setMentorTip(comboHint || mentorSkillTips[skill.id] || "先看汉字牌的效果，再选择施法者。精神足够时，就可以开始书写。", 'guide', false, '');
   }
 }
 
-function selectSkill(skillId) {
+function selectSkill(skillId, showTip = false) {
   const skill = skillData[skillId];
   if (!skill) return;
   selectedSkill = skillId;
@@ -234,23 +307,19 @@ function selectSkill(skillId) {
     card.classList.toggle("selected", card.dataset.skill === skillId);
     card.setAttribute('aria-pressed', String(card.dataset.skill === skillId));
   });
-  showSkillInfo(skillId);
+  showSkillInfo(skillId, showTip);
 }
 
 function selectCharacter(characterId) {
-  if (battleEnded || battleState.turn.side !== 'player') return;
+  if (openingActive || battleEnded || battleState.turn.side !== 'player') return;
   if (!battleState.party.some((member) => member.id === characterId)) return;
   selectedCharacter = characterId;
   renderCharacters();
   showSkillInfo();
 }
 
-function calculateDamage(actor, skill) {
-  const rawDamage = skill.basePower + actor.attack - battleState.enemy.defense;
-  return Math.max(1, Math.round(rawDamage));
-}
-
 function applySkill(writingScore = null) {
+  if (openingActive) return;
   if (infoMode === "character") {
     showSkillInfo();
     return;
@@ -264,26 +333,55 @@ function applySkill(writingScore = null) {
   }
 
   if (skill.requiresWriting && !writingScore?.tier) {
+    const rules = getWritingScoreRules(battleState.writingDifficulty);
+    const perfectCoverage = Math.round(rules.perfectCoverage * 100);
+    const perfectPrecision = Math.round(rules.perfectPrecision * 100);
     writingPending = { actorId: actor.id, skillId: selectedSkill };
     document.querySelector('#writing-title').textContent = `书写 · ${skill.char}`;
     resetWriting(skill.char);
+    document.querySelector('.channel-glyph').textContent = skill.char;
+    document.querySelector('.battlefield').dataset.channelSkill = skill.id;
+    document.querySelector('.battlefield').style.setProperty('--channel-x', actor.id === 'shen_yan' ? '25%' : '12%');
+    writingDialog.dataset.skill = skill.id;
+    document.querySelector('.battlefield').classList.add('channeling');
     setWritingGuide(skill);
-    setMentorTip("看淡墨底字落笔：覆盖该有的笔画，避开空白。覆盖与准确双过90%，便是完美。");
+    const teaching = battleState.writingDifficulty === 'tutorial' ? '这一次，师父借你一缕文气。' : '';
+    setMentorTip(`${teaching}看淡墨底字落笔：覆盖达到${perfectCoverage}%、准确达到${perfectPrecision}%，便能成术。`, 'guide', false, '顺着淡墨落笔。稳住笔锋。');
     writingDialog.showModal();
     startWritingTimer();
     return;
   }
   const power = skill.requiresWriting ? writingScore.power : 1;
+  let comboTriggered = false;
   actor.spirit = clamp(actor.spirit - skill.spiritCost, 0, actor.maxSpirit);
   if (writingScore?.tier) showWritingFeedback(writingScore, skill, actor);
 
   if (power === 0) {
     setLog(`${actor.name} 的「${skill.char}」未能成形，施法失败。`);
   } else if (skill.effect === "damage") {
-    const damage = Math.round(calculateDamage(actor, skill) * power);
+    comboTriggered = skillConsumesState(skill, battleState.enemy.states);
+    const damage = Math.round(calculateDamage(actor, skill, battleState.enemy.defense, battleState.enemy.states) * power);
     battleState.enemy.hp = clamp(battleState.enemy.hp - damage, 0, battleState.enemy.maxHp);
-    setLog(`${actor.name} 释放「${skill.char}」，霜藤妖受到 ${damage} 点伤害。`);
-    feedback('enemy', `-${damage}`);
+    if (comboTriggered) {
+      battleState.enemy.states = battleState.enemy.states.filter(state => state !== skill.consumesState);
+      setLog(`${actor.name} 写下「${skill.char}」，火刀相接！焰刃破藤，造成 ${damage} 点伤害。`);
+      showComboFeedback(actor);
+    } else {
+      setLog(`${actor.name} 释放「${skill.char}」，霜藤妖受到 ${damage} 点伤害。`);
+    }
+    if (battleState.enemy.hp > 0 && skillAppliesState(skill, power) && !battleState.enemy.states.includes(skill.appliesState)) {
+      battleState.enemy.states.push(skill.appliesState);
+      combatLog.textContent += ' 灼痕已成，下一笔接「刀」！';
+    }
+    if (skill.char === '火' || skill.char === '刀') {
+      const currentBattle = battleState;
+      setTimeout(() => {
+        if (battleState === currentBattle) feedback('enemy', `-${damage}`);
+      }, skill.char === '火' ? 780 : 520);
+    } else {
+      feedback('enemy', `-${damage}`);
+    }
+    showBattleOmen();
   }
 
   if (skill.effect === "control" && power >= .5) {
@@ -305,16 +403,24 @@ function applySkill(writingScore = null) {
     }
     if (power >= .5) battleState.enemy.states = battleState.enemy.states.filter((state) => state !== "狂暴");
     setLog(`${actor.name} 写下「${skill.char}」，恢复 ${heal} 点生命${power >= .5 ? '，净化生效' : '，笔力不足以净化'}。`);
-    feedback(actor.id, `+${heal}`);
+    const currentBattle = battleState;
+    setTimeout(() => {
+      if (battleState === currentBattle) feedback(actor.id, `+${heal}`);
+    }, 320);
   }
 
   const sprite = document.querySelector(actor.id === 'shen_yan' ? '.hero' : '.mentor');
   sprite.classList.remove('acting');
   void sprite.offsetWidth;
   sprite.classList.add('acting');
-  if (writingScore?.tier) combatLog.textContent += ` 书写 ${Math.round(writingScore.score * 100)} 分，威力 ${Math.round(power * 100)}%。`;
-  checkOutcome();
-  if (!battleEnded) beginEnemyTurn(actor.id);
+  if (writingScore?.tier) {
+    const teaching = battleState.writingDifficulty === 'tutorial' && writingScore.tier === 'perfect' ? '，师父文气助力' : '';
+    combatLog.textContent += ` 笔迹契合 ${Math.round(writingScore.score * 100)}%，威力 ${Math.round(power * 100)}%${teaching}。`;
+  }
+  const fireCast = skill.char === '火' && power > 0;
+  const finishingEffect = (skill.char === '刀' && power > 0) || writingScore?.tier === 'perfect';
+  checkOutcome(fireCast ? 2000 : finishingEffect ? 1600 : 0);
+  if (!battleEnded) beginEnemyTurn(actor.id, fireCast ? 1.2 : writingScore?.tier === 'perfect' ? 1 : power > 0 ? .7 : 0);
   renderAll();
   showSkillInfo();
   castButton.animate(
@@ -329,7 +435,7 @@ function applySkill(writingScore = null) {
 
 function buildSavePayload() {
   return {
-    version: 2,
+    version: 3,
     currentChapter: "volume_01_battle_mock",
     selectedSkill,
     selectedCharacter,
@@ -358,11 +464,12 @@ async function saveProgress() {
 }
 
 function applySave(save) {
+  document.querySelectorAll('.blade-companion').forEach(node => node.remove());
   if (save?.battleState) {
     battleState = clone(save.battleState);
   }
   selectedCharacter = save?.selectedCharacter || battleState.party[0].id;
-  selectedSkill = save?.selectedSkill || battleState.selectedSkill || "zhan";
+  selectedSkill = save?.selectedSkill || battleState.selectedSkill || "dao";
   battleEnded = false;
   normalizeBattle();
   renderAll();
@@ -388,7 +495,9 @@ async function loadProgress() {
 }
 
 cards.forEach((card) => {
-  card.addEventListener("click", () => selectSkill(card.dataset.skill));
+  card.addEventListener("click", () => {
+    if (!openingActive) selectSkill(card.dataset.skill, true);
+  });
 });
 
 characterCards.forEach((card) => {
@@ -414,6 +523,7 @@ async function init() {
   battleState = clone(battle);
   initialBattle = clone(battle);
   const localSave = loadLocalSave();
+  const resumedBattle = Boolean(localSave?.battleState);
   if (localSave?.battleState) {
     battleState = clone(localSave.battleState);
     selectedCharacter = localSave.selectedCharacter || selectedCharacter;
@@ -426,7 +536,80 @@ async function init() {
   selectSkill(selectedSkill);
   setupBattleUI();
   checkOutcome();
+  if (!resumedBattle && !battleEnded) showOpeningSequence();
   setInterval(tickBattle, 100);
+}
+
+function clearOpeningTimers() {
+  openingTimers.forEach(clearTimeout);
+  openingTimers = [];
+}
+
+function setOpeningPhase(phase, line, detail) {
+  if (phase === 'trapped') document.querySelectorAll('.blade-companion').forEach(node => node.remove());
+  if (phase === 'rescue') showBladeAttack(document.querySelector('.battlefield'), { id: 'lu_qingya' }, { tier: 'good', power: 1 }, false);
+  openingSequence.dataset.phase = phase;
+  document.querySelector('.battlefield').dataset.openingPhase = phase;
+  openingLine.textContent = line;
+  openingDetail.textContent = detail;
+  document.querySelector('#opening-start').hidden = phase !== 'ready';
+  if (phase === 'ready') document.querySelector('#opening-start').focus();
+}
+
+function showOpeningSequence() {
+  if (!battleState.tutorialIntro) return;
+  clearOpeningTimers();
+  hideMentorTip();
+  openingActive = true;
+  openingSequence.hidden = false;
+  document.querySelector('.game-shell').classList.add('intro-mode');
+  document.querySelector('.hud').inert = true;
+  document.querySelector('.pause-button').disabled = true;
+  document.querySelector('.battlefield').classList.add('opening-active');
+  document.querySelector('.battlefield').classList.remove('omen-awake');
+  setOpeningPhase('trapped', '醒来时，霜藤已经缠住了你。', '笔还在手中，却一个字也写不出。');
+  document.querySelector('#opening-skip').focus();
+  openingTimers.push(setTimeout(() => {
+    setOpeningPhase('rescue', '陆青崖只写了一个字：刀。', '墨锋斩断妖藤，雪林里第一次响起字的力量。');
+  }, 1500));
+  openingTimers.push(setTimeout(() => {
+    setOpeningPhase('ready', '师父退开，剩下这一击交给你。', '写「火」烧开霜藤，再接师父的「刀」——让两个字连成一招。');
+  }, 3700));
+}
+
+function finishOpening(startWriting) {
+  if (!openingActive) return;
+  clearOpeningTimers();
+  openingActive = false;
+  openingSequence.hidden = true;
+  document.querySelector('.game-shell').classList.remove('intro-mode');
+  document.querySelector('.hud').inert = false;
+  document.querySelector('.pause-button').disabled = false;
+  document.querySelector('.battlefield').classList.remove('opening-active');
+  delete document.querySelector('.battlefield').dataset.openingPhase;
+  document.querySelector('.battlefield').classList.toggle('omen-awake', Boolean(battleState.tutorialOmenShown));
+  selectSkill('dao');
+  if (startWriting) {
+    playCue('draw');
+    applySkill();
+  } else {
+    castButton.focus();
+  }
+}
+
+document.querySelector('#opening-skip').addEventListener('click', () => finishOpening(false));
+document.querySelector('#opening-start').addEventListener('click', () => finishOpening(true));
+
+function showBattleOmen() {
+  if (!battleState.tutorialIntro || battleState.tutorialOmenShown || battleState.enemy.hp <= 0 || battleState.enemy.hp > battleState.enemy.maxHp / 2) return;
+  battleState.tutorialOmenShown = true;
+  battleOmen.hidden = false;
+  battleOmen.classList.remove('shown');
+  void battleOmen.offsetWidth;
+  battleOmen.classList.add('shown');
+  playCue('omen');
+  clearTimeout(omenTimer);
+  omenTimer = setTimeout(() => { battleOmen.hidden = true; }, 2800);
 }
 
 function feedback(target, text) {
@@ -442,29 +625,52 @@ function feedback(target, text) {
   setTimeout(() => node.remove(), 1000);
 }
 
-function checkOutcome() {
+function checkOutcome(resultDelay = 0) {
   if (battleEnded || !battleState) return;
-  const win = battleState.enemy.hp <= 0;
-  if (!win && battleState.party.some(member => member.hp > 0)) return;
+  const result = getBattleResult(battleState);
+  if (result === 'ongoing') return;
+  const win = result === 'win';
   battleEnded = true;
+  hideMentorTip();
   writingDialog.close();
   menuDialog.close();
   document.querySelector('#result-title').textContent = win ? '妖邪已退' : '力竭倒下';
   document.querySelector('#result-text').textContent = win ? '雪林暂安，此战告捷。' : '霜藤封路，整装再战。';
-  resultDialog.showModal();
+  document.querySelector('.result-hook').hidden = !win || !battleState.tutorialIntro;
+  const revealResult = () => {
+    if (win) playCue('victory');
+    resultDialog.showModal();
+    resultTimer = null;
+  };
+  if (win && resultDelay > 0) resultTimer = setTimeout(revealResult, resultDelay);
+  else revealResult();
 }
 
 function normalizeBattle() {
-  for (const entity of [...battleState.party, battleState.enemy]) delete entity.action;
-  battleState.turn ||= { side: 'player', round: 1, skipEnemy: false, targetId: null };
+  normalizeBattleState(battleState);
+  hideMentorTip();
+  clearTimeout(omenTimer);
+  clearTimeout(resultTimer);
+  resultTimer = null;
+  battleOmen.hidden = true;
+  if (!battleState.writingDifficulty) {
+    battleState.writingDifficulty = battleState.chapter === initialBattle?.chapter
+      ? initialBattle.writingDifficulty || 'standard'
+      : 'standard';
+  }
+  if (typeof battleState.tutorialIntro !== 'boolean') {
+    battleState.tutorialIntro = battleState.chapter === initialBattle?.chapter && Boolean(initialBattle?.tutorialIntro);
+  }
+  battleState.tutorialOmenShown ||= false;
+  battleState.tutorialFirstPerfectShown ||= false;
   enemyDelay = 0;
   lastTick = performance.now();
 }
 
-function beginEnemyTurn(targetId) {
+function beginEnemyTurn(targetId, extraDelay = 0) {
   battleState.turn.side = 'enemy';
   battleState.turn.targetId = targetId;
-  enemyDelay = 0;
+  enemyDelay = -extraDelay;
   lastTick = performance.now();
 }
 
@@ -534,6 +740,9 @@ let activePointer = null;
 let writingDeadline = 0;
 let writingTimer = null;
 const countdown = document.querySelector('#writing-countdown');
+const writingLivePower = document.querySelector('#writing-live-power');
+const writingLiveFill = document.querySelector('#writing-live-fill');
+let lastWritingPreview = 0;
 const BRUSH_MIN_WIDTH = 7;
 const BRUSH_MAX_WIDTH = 28;
 const BRUSH_BLOOM_DELAY = 180;
@@ -561,6 +770,7 @@ function finishActiveStroke() {
   tip.pressure = clamp(tip.pressure + activeStroke.hold * 0.16, 0, 1);
   activeStroke = null;
   renderInk();
+  updateWritingPreview(true);
 }
 
 function updateWritingTimer() {
@@ -591,7 +801,11 @@ function drawWriting() {
   context.globalAlpha = .18;
   context.drawImage(template, 0, 0);
   context.globalAlpha = 1;
+  context.save();
+  context.shadowColor = writingInkGlow[writingPending?.skillId] || '#d7c7a4';
+  context.shadowBlur = 14;
   context.drawImage(ink, 0, 0);
+  context.restore();
 }
 
 function markInk() {
@@ -733,6 +947,24 @@ function renderInk() {
   inkContext.restore();
   if (brushStrokes.length) markInk();
   drawWriting();
+  updateWritingPreview();
+}
+
+function updateWritingPreview(force = false) {
+  if (!writingPending || !writingDialog.open || !templateMask) return;
+  const now = performance.now();
+  if (!force && now - lastWritingPreview < 120) return;
+  lastWritingPreview = now;
+  const pixels = inkContext.getImageData(0, 0, 400, 400).data;
+  const result = scoreWriting(templateMask, pixels, getWritingScoreRules(battleState.writingDifficulty));
+  const power = Math.round(result.power * 100);
+  writingLivePower.textContent = `${power}%`;
+  writingLiveFill.style.width = `${power}%`;
+  writingLiveFill.classList.toggle('perfect', result.tier === 'perfect');
+  const field = document.querySelector('.battlefield');
+  field.style.setProperty('--writing-opacity', String(.2 + result.power * .8));
+  field.style.setProperty('--writing-scale', String(.55 + result.power * .55));
+  field.classList.toggle('writing-ready', result.tier === 'perfect');
 }
 
 function bloomBrush(now) {
@@ -781,6 +1013,12 @@ function resetWriting(char) {
   inkContext.clearRect(0, 0, 400, 400);
   document.querySelector('#writing-result').textContent = '落笔凝字';
   document.querySelector('#submit-writing').disabled = true;
+  writingLivePower.textContent = '0%';
+  writingLiveFill.style.width = '0%';
+  writingLiveFill.classList.remove('perfect');
+  document.querySelector('.battlefield').style.setProperty('--writing-opacity', '.3');
+  document.querySelector('.battlefield').style.setProperty('--writing-scale', '.62');
+  document.querySelector('.battlefield').classList.remove('writing-ready');
   drawWriting();
 }
 
@@ -840,44 +1078,61 @@ function finishWriting(reason) {
   writingPending = null;
   stopWriting();
   writingDialog.close();
+  document.querySelector('.battlefield').classList.remove('channeling', 'writing-ready');
+  delete document.querySelector('.battlefield').dataset.channelSkill;
+  document.querySelector('.battlefield').style.removeProperty('--channel-x');
+  delete writingDialog.dataset.skill;
   if (!hasInk) {
     setLog('书写时间已到，尚未落笔，请重新选招。');
-    setMentorTip("未落笔不会消耗精神。下一次先稳住呼吸，再从淡墨最清楚的一笔开始。", 'warn');
+    setMentorTip("未落笔不会消耗精神。下一次先稳住呼吸，再从淡墨最清楚的一笔开始。", 'warn', false, '还未落笔，不耗精神。再试一次。');
     return;
   }
   const pixels = inkContext.getImageData(0, 0, 400, 400).data;
-  const score = scoreWriting(templateMask, pixels);
+  const score = scoreWriting(templateMask, pixels, getWritingScoreRules(battleState.writingDifficulty));
   selectedCharacter = pending.actorId;
   selectedSkill = pending.skillId;
   applySkill(score);
 }
 
 function showWritingFeedback(result, skill, actor) {
+  const skillCue = { 火: 'fire', 刀: 'slash', 止: 'seal', 生: 'heal' };
+  playCue(result.power > 0 ? skillCue[skill.char] || 'perfect' : 'omen');
   speak(skill.char, actor.id === 'shen_yan' ? 'hero' : 'mentor', { interrupt: true });
   const field = document.querySelector('.battlefield');
   field.scrollIntoView({ block: 'nearest', behavior: 'instant' });
-  field.querySelectorAll('.writing-verdict, .enemy-taunt, .ink-burst').forEach(node => node.remove());
+  field.querySelectorAll('.writing-verdict, .enemy-taunt, .ink-burst, .perfect-ritual, .skill-effect').forEach(node => node.remove());
   const coverage = Math.round(result.coverage * 100);
   const precision = Math.round(result.precision * 100);
+  const teachingBoost = result.tier === 'perfect' && battleState.writingDifficulty === 'tutorial';
+  const perfectCoverage = Math.round(result.perfectCoverage * 100);
+  const perfectPrecision = Math.round(result.perfectPrecision * 100);
   const verdict = document.createElement('div');
   verdict.className = `writing-verdict ${result.tier}`;
   const title = document.createElement('strong');
-  title.textContent = `${({ perfect: '神完气足', good: '笔力遒劲', normal: '初具字形', weak: '笔力微弱', flooded: '墨乱神散' })[result.tier]} · ${Math.round(result.score * 100)}分`;
+  const verdictName = teachingBoost ? '初悟成字' : ({ perfect: '神完气足', good: '笔力遒劲', normal: '初具字形', weak: '笔力微弱', flooded: '墨乱神散' })[result.tier];
+  title.textContent = `${verdictName} · ${Math.round(result.power * 100)}%威力`;
   const detail = document.createElement('span');
-  detail.textContent = `覆盖 ${coverage}% · 准确 ${precision}% · 威力 ${Math.round(result.power * 100)}%`;
+  detail.textContent = `笔迹契合 ${Math.round(result.score * 100)}% · 覆盖 ${coverage}% · 准确 ${precision}%${teachingBoost ? ' · 文气助力' : ''}`;
   verdict.append(title, detail);
   field.append(verdict);
   setTimeout(() => verdict.remove(), 4200);
   if (result.tier === 'perfect') {
-    setMentorTip(`好字！覆盖 ${coverage}%、准确 ${precision}%，双过90%，这一击便是完美书写。`, 'praise', true);
+    if (battleState.tutorialIntro && !battleState.tutorialFirstPerfectShown) {
+      battleState.tutorialFirstPerfectShown = true;
+      field.classList.add('first-awakening');
+      setTimeout(() => field.classList.remove('first-awakening'), 2100);
+      setMentorTip('好！师父借你一缕文气，字已成术。继续落笔，试试别的字。', 'praise', true, '好字！这一笔成了。');
+    } else {
+      setMentorTip(`好字！覆盖 ${coverage}%、准确 ${precision}%，达到本关的${perfectCoverage}%与${perfectPrecision}%要求，这一击便是完美书写。`, 'praise', true, '好字！笔势圆满。');
+    }
   } else if (result.tier === 'flooded') {
-    setMentorTip(`墨铺得太满，空白也被吞了。宁可少写一分，也别把画布涂成一团。`, 'warn', true);
+    setMentorTip(`墨铺得太满，空白也被吞了。宁可少写一分，也别把画布涂成一团。`, 'warn', true, '墨铺得太满。留些空白。');
   } else if (result.tier === 'weak') {
-    setMentorTip(`笔画偏得多了些。先追淡墨的骨架，覆盖上去，再谈速度。`, 'warn', true);
+    setMentorTip(`笔画偏得多了些。先追淡墨的骨架，覆盖上去，再谈速度。`, 'warn', true, '笔画偏了。贴着淡墨再写。');
   } else if (result.power >= .5) {
-    setMentorTip(`已能成招。想要完美，就让覆盖和准确同时到90%以上。`, 'guide', true);
+    setMentorTip(`已能成招。想要完美，就让覆盖达到${perfectCoverage}%、准确达到${perfectPrecision}%。`, 'guide', true, '字已成形。再稳一点。');
   } else {
-    setMentorTip(`字形已起，但笔力还浅。少写空白，多贴淡墨，威力会立刻上来。`, 'guide', true);
+    setMentorTip(`字形已起，但笔力还浅。少写空白，多贴淡墨，威力会立刻上来。`, 'guide', true, '笔力还浅。再贴近淡墨。');
   }
   if (['weak', 'flooded'].includes(result.tier)) {
     const taunt = document.createElement('div');
@@ -888,29 +1143,255 @@ function showWritingFeedback(result, skill, actor) {
     setTimeout(() => taunt.remove(), 4200);
   }
   if (result.power > 0) {
+    if (skill.char === '火') {
+      showFireAttack(field, actor, result);
+      return;
+    }
+    if (skill.char === '刀') {
+      showBladeAttack(field, actor, result, skillConsumesState(skill, battleState.enemy.states));
+      return;
+    }
+    if (skill.char === '止') {
+      showStopSeal(field, result);
+      return;
+    }
+    if (skill.char === '生') {
+      showLifeBloom(field, actor, result);
+      return;
+    }
     const burst = document.createElement('div');
-    burst.className = `ink-burst ${result.tier}`;
+    burst.className = `ink-burst ${result.tier} ${skill.effect} skill-${skill.id}`;
     burst.style.left = actor.id === 'shen_yan' ? '25%' : '12%';
+    burst.style.setProperty('--target-x', skill.effect === 'cleanse' ? (actor.id === 'shen_yan' ? '25%' : '12%') : '76%');
     burst.textContent = skill.char;
     field.append(burst);
     if (result.tier === 'perfect') {
-      for (let i = 0; i < 18; i++) {
-        const drop = document.createElement('i');
-        drop.style.setProperty('--dx', `${Math.cos(i * 2.4) * (70 + i * 4)}px`);
-        drop.style.setProperty('--dy', `${Math.sin(i * 2.4) * (40 + i * 3)}px`);
-        burst.append(drop);
-      }
+      showPerfectRitual(field, skill, actor);
     }
-    setTimeout(() => burst.remove(), 1100);
+    setTimeout(() => burst.remove(), result.tier === 'perfect' ? 1500 : 1100);
   }
+}
+
+function showFireAttack(field, actor, result) {
+  const attack = document.createElement('div');
+  attack.className = `skill-effect fire-attack ${result.tier}`;
+  attack.setAttribute('aria-hidden', 'true');
+  attack.style.setProperty('--cast-x', actor.id === 'shen_yan' ? '25%' : '12%');
+  attack.style.setProperty('--target-x', '76%');
+
+  for (const part of ['fire-ignition', 'fire-trail', 'fire-impact']) {
+    const node = document.createElement('span');
+    node.className = part;
+    attack.append(node);
+  }
+  for (let i = 0; i < 12; i++) {
+    const flame = document.createElement('i');
+    flame.className = 'fire-tongue';
+    flame.style.setProperty('--fire-delay', `${i * 46}ms`);
+    flame.style.setProperty('--fire-rise', `${(i % 5 - 2) * 18}px`);
+    flame.style.setProperty('--flame-size', `${18 + i % 4 * 9}px`);
+    attack.append(flame);
+  }
+  for (let i = 0; i < 18; i++) {
+    const ember = document.createElement('i');
+    ember.className = 'fire-ember';
+    const angle = i * 2.39996;
+    const radius = 38 + i % 5 * 17;
+    ember.style.setProperty('--ember-x', `${Math.cos(angle) * radius}px`);
+    ember.style.setProperty('--ember-y', `${Math.sin(angle) * radius * .8}px`);
+    ember.style.setProperty('--ember-delay', `${i % 6 * 38}ms`);
+    attack.append(ember);
+  }
+  field.append(attack);
+  setTimeout(() => attack.remove(), result.tier === 'perfect' ? 2100 : 1850);
+}
+
+function showBladeAttack(field, actor, result, combo) {
+  const owner = field.querySelector(actor.id === 'shen_yan' ? '.hero' : '.mentor');
+  let companion = owner.querySelector('.blade-companion');
+  if (!companion) {
+    companion = document.createElement('img');
+    companion.className = 'blade-companion';
+    companion.src = 'src/assets/summoned-blade.svg';
+    companion.alt = '悬浮护身的召唤刀';
+    companion.draggable = false;
+    owner.append(companion);
+  }
+  companion.classList.toggle('flaming', combo);
+  const attack = document.createElement('div');
+  attack.className = `skill-effect blade-attack ${result.tier}${combo ? ' combo' : ''}`;
+  attack.setAttribute('aria-hidden', 'true');
+  attack.style.setProperty('--cast-x', actor.id === 'shen_yan' ? '25%' : '12%');
+  attack.style.setProperty('--target-x', '76%');
+  const summon = document.createElement('div');
+  summon.className = 'blade-summon';
+  const weapon = document.createElement('img');
+  weapon.className = 'summoned-blade';
+  weapon.src = 'src/assets/summoned-blade.svg';
+  weapon.alt = '';
+  weapon.draggable = false;
+  summon.append(weapon);
+  if (combo) {
+    const flames = document.createElement('span');
+    flames.className = 'blade-flames';
+    for (let i = 0; i < 9; i++) {
+      const flame = document.createElement('i');
+      flame.style.setProperty('--flame-position', `${28 + i * 7}%`);
+      flame.style.setProperty('--flame-delay', `${-i * 83}ms`);
+      flame.style.setProperty('--flame-height', `${75 + i % 3 * 20}%`);
+      flames.append(flame);
+    }
+    summon.append(flames);
+  }
+  attack.append(summon);
+  for (const part of ['blade-summon-ring', 'blade-dash', 'blade-flash']) {
+    const node = document.createElement('span');
+    node.className = part;
+    attack.append(node);
+  }
+  for (let i = 0; i < 3; i++) {
+    const cut = document.createElement('span');
+    cut.className = 'blade-cut';
+    cut.style.setProperty('--cut-y', `${(i - 1) * 22}px`);
+    cut.style.setProperty('--cut-delay', `${i * 100}ms`);
+    attack.append(cut);
+  }
+  for (let i = 0; i < 14; i++) {
+    const spark = document.createElement('i');
+    spark.className = 'blade-spark';
+    const angle = i * 2.39996;
+    const radius = 45 + i % 4 * 20;
+    spark.style.setProperty('--spark-x', `${Math.cos(angle) * radius}px`);
+    spark.style.setProperty('--spark-y', `${Math.sin(angle) * radius}px`);
+    spark.style.setProperty('--spark-delay', `${i % 5 * 35}ms`);
+    attack.append(spark);
+  }
+  field.append(attack);
+  setTimeout(() => attack.remove(), 2100);
+}
+
+function showStopSeal(field, result) {
+  const attack = document.createElement('div');
+  attack.className = `skill-effect stop-effect ${result.power >= .5 ? 'sealed' : 'fizzle'} ${result.tier}`;
+  attack.setAttribute('aria-hidden', 'true');
+  for (const part of ['stop-ring', 'stop-stamp']) {
+    const node = document.createElement('span');
+    node.className = part;
+    if (part === 'stop-stamp') node.textContent = '止';
+    attack.append(node);
+  }
+  for (let i = 0; i < 5; i++) {
+    const band = document.createElement('span');
+    band.className = 'stop-script-band';
+    band.textContent = '止 · 止 · 止 · 止 · 止 · 止';
+    band.style.setProperty('--band-y', `${36 + i * 7}%`);
+    band.style.setProperty('--band-angle', `${i % 2 ? -12 : 12}deg`);
+    band.style.setProperty('--band-delay', `${i * 90}ms`);
+    attack.append(band);
+  }
+  field.append(attack);
+  if (result.power >= .5) {
+    const enemy = field.querySelector('.enemy');
+    enemy.classList.add('sealed-visual');
+    setTimeout(() => enemy.classList.remove('sealed-visual'), 1350);
+  }
+  setTimeout(() => attack.remove(), 1650);
+}
+
+function showLifeBloom(field, actor, result) {
+  const attack = document.createElement('div');
+  attack.className = `skill-effect life-effect ${result.tier}`;
+  attack.setAttribute('aria-hidden', 'true');
+  attack.style.setProperty('--heal-x', actor.id === 'shen_yan' ? '25%' : '12%');
+  for (const part of ['life-aura', 'life-ring', 'life-ring inner', 'life-totem']) {
+    const node = document.createElement('span');
+    node.className = part;
+    if (part === 'life-totem') node.textContent = '生';
+    attack.append(node);
+  }
+  for (let i = 0; i < 5; i++) {
+    const vine = document.createElement('span');
+    vine.className = 'life-vine';
+    vine.style.setProperty('--vine-x', `${(i - 2) * 27}px`);
+    vine.style.setProperty('--vine-angle', `${(i - 2) * 13}deg`);
+    vine.style.setProperty('--vine-delay', `${i * 80}ms`);
+    const flower = document.createElement('span');
+    flower.className = 'life-flower';
+    for (let petalIndex = 0; petalIndex < 5; petalIndex++) {
+      const petal = document.createElement('i');
+      petal.style.rotate = `${petalIndex * 72}deg`;
+      flower.append(petal);
+    }
+    vine.append(flower);
+    attack.append(vine);
+  }
+  for (let i = 0; i < 16; i++) {
+    const mote = document.createElement('i');
+    mote.className = 'life-mote';
+    mote.style.setProperty('--mote-x', `${(i % 7 - 3) * 19}px`);
+    mote.style.setProperty('--mote-rise', `${60 + i % 5 * 21}px`);
+    mote.style.setProperty('--mote-delay', `${i % 6 * 70}ms`);
+    attack.append(mote);
+  }
+  field.append(attack);
+  setTimeout(() => attack.remove(), 1750);
+}
+
+function showPerfectRitual(field, skill, actor) {
+  const ritual = document.createElement('div');
+  ritual.className = `perfect-ritual perfect-${skill.effect} skill-${skill.id}`;
+  ritual.setAttribute('aria-hidden', 'true');
+  ritual.style.setProperty('--cast-x', actor.id === 'shen_yan' ? '25%' : '12%');
+  ritual.style.setProperty('--target-x', skill.effect === 'cleanse' ? (actor.id === 'shen_yan' ? '25%' : '12%') : '76%');
+
+  for (const part of ['perfect-flash', 'perfect-sigil', 'perfect-stream', 'perfect-impact']) {
+    const node = document.createElement('span');
+    node.className = part;
+    ritual.append(node);
+  }
+  for (let i = 0; i < 32; i++) {
+    const spark = document.createElement('i');
+    spark.className = `perfect-spark ${i < 16 ? 'at-cast' : 'at-impact'}`;
+    const angle = i * 2.39996;
+    const radius = 52 + (i % 5) * 22;
+    spark.style.setProperty('--spark-x', `${Math.cos(angle) * radius}px`);
+    spark.style.setProperty('--spark-y', `${Math.sin(angle) * radius * .7}px`);
+    spark.style.setProperty('--spark-delay', `${(i % 6) * 45}ms`);
+    ritual.append(spark);
+  }
+  field.append(ritual);
+  setTimeout(() => ritual.remove(), 2000);
+}
+
+function showComboFeedback(actor) {
+  const field = document.querySelector('.battlefield');
+  const banner = document.createElement('div');
+  banner.className = 'combo-banner';
+  banner.setAttribute('role', 'status');
+  banner.textContent = actor.id === 'lu_qingya' ? '师徒接力 · 火刀破藤！' : '火刀连字 · 焰刃破藤！';
+  field.append(banner);
+  playCue('perfect');
+  setTimeout(() => banner.remove(), 2200);
 }
 document.querySelector('#submit-writing').addEventListener('click', () => finishWriting('button'));
 writingDialog.addEventListener('close', () => {
-  if (!writingDialog.open) { stopWriting(); writingPending = null; }
+  if (!writingDialog.open) {
+    stopWriting();
+    writingPending = null;
+    document.querySelector('.battlefield').classList.remove('channeling', 'writing-ready');
+    delete document.querySelector('.battlefield').dataset.channelSkill;
+    document.querySelector('.battlefield').style.removeProperty('--channel-x');
+    delete writingDialog.dataset.skill;
+  }
 });
 document.addEventListener('visibilitychange', updateWritingTimer);
 document.querySelector('.pause-button').addEventListener('click', () => menuDialog.showModal());
 document.querySelector('#resume-battle').addEventListener('click', () => menuDialog.close());
+document.querySelector('#replay-opening').addEventListener('click', () => {
+  if (!battleState.tutorialIntro || battleEnded || battleState.turn.side !== 'player') return;
+  menuDialog.close();
+  showOpeningSequence();
+});
 document.querySelector('#restart-battle').addEventListener('click', () => {
   stopVoice();
   battleState = clone(initialBattle);
@@ -921,16 +1402,17 @@ document.querySelector('#restart-battle').addEventListener('click', () => {
   renderAll();
   selectSkill('dao');
   setLog('雪林交锋，再起笔锋。');
+  showOpeningSequence();
 });
 resultDialog.addEventListener('cancel', event => event.preventDefault());
 
 restButton.addEventListener('click', () => {
   const actor = getActor();
-  if (battleEnded || battleState.turn.side !== 'player' || actor.hp <= 0) return;
+  if (openingActive || battleEnded || battleState.turn.side !== 'player' || actor.hp <= 0) return;
   const restored = Math.min(20, actor.maxSpirit - actor.spirit);
   actor.spirit += restored;
   setLog(`${actor.name} 调息，恢复 ${Math.floor(restored)} 点精神。`);
-  setMentorTip("调息也算一次行动。精神不足时可用，但要准备承受妖物反击。");
+  setMentorTip("调息也算一次行动。精神不足时可用，但要准备承受妖物反击。", 'guide', false, '调息回气。留心反击。');
   beginEnemyTurn(actor.id);
   renderAll();
   showSkillInfo();
