@@ -85,6 +85,7 @@ try:
         adb('shell', 'cmd', 'connectivity', 'airplane-mode', 'disable')
         adb('shell', 'svc', 'wifi', 'enable')
         adb('shell', 'svc', 'data', 'enable')
+        time.sleep(10)
         adb('shell', 'am', 'force-stop', 'com.godofhanzi.game')
         adb('shell', 'am', 'start', '-n', 'com.godofhanzi.game/.MainActivity')
         wait('新版本已下载', seconds=240)
@@ -122,6 +123,7 @@ finally:
     subprocess.run(['adb', 'shell', 'screencap', '-p', '/sdcard/smoke.png'], check=False)
     subprocess.run(['adb', 'pull', '/sdcard/smoke.png', str(out / 'screen.png')], check=False)
     (out / 'logcat.txt').write_text(adb('logcat', '-d', '-t', '1000'), encoding='utf-8')
+
 
 
 
