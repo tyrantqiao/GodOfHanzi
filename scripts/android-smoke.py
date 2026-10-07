@@ -12,7 +12,11 @@ def adb(*args):
     return subprocess.check_output(['adb', *args]).decode('utf-8', errors='replace')
 
 def dump():
-    adb('shell', 'uiautomator', 'dump', '/sdcard/window.xml')
+    try:
+        adb('shell', 'uiautomator', 'dump', '/sdcard/window.xml')
+    except subprocess.CalledProcessError:
+        time.sleep(2)
+        return ET.Element('hierarchy')
     raw = adb('shell', 'cat', '/sdcard/window.xml')
     (out / 'last-window.xml').write_text(raw, encoding='utf-8')
     return ET.fromstring(raw)
@@ -47,7 +51,8 @@ def click(label, direction='down'):
     raise AssertionError('无法点击：' + label)
 
 try:
-    adb('install', '-r', 'smoke-apk/GodOfHanzi.apk')
+    base = Path('smoke-base/GodOfHanzi.apk')
+    adb('install', '-r', str(base if base.exists() else Path('smoke-apk/GodOfHanzi.apk')))
     adb('shell', 'svc', 'wifi', 'disable')
     adb('shell', 'svc', 'data', 'disable')
     adb('shell', 'am', 'start', '-n', 'com.godofhanzi.game/.MainActivity')
@@ -61,8 +66,31 @@ try:
     wait('继续存档')
     click('继续存档', direction='up')
     click('李白')
+    if base.exists():
+        adb('shell', 'appops', 'set', 'com.godofhanzi.game', 'REQUEST_INSTALL_PACKAGES', 'allow')
+        adb('shell', 'svc', 'wifi', 'enable')
+        adb('shell', 'svc', 'data', 'enable')
+        adb('shell', 'am', 'force-stop', 'com.godofhanzi.game')
+        adb('shell', 'am', 'start', '-n', 'com.godofhanzi.game/.MainActivity')
+        wait('新版本已下载', seconds=240)
+        click('安装更新')
+        time.sleep(3)
+        click('安装')
+        deadline = time.time() + 60
+        while time.time() < deadline:
+            if 'versionCode=2 ' in adb('shell', 'dumpsys', 'package', 'com.godofhanzi.game'):
+                break
+            time.sleep(2)
+        else:
+            raise AssertionError('系统未完成覆盖更新')
+        adb('shell', 'am', 'start', '-n', 'com.godofhanzi.game/.MainActivity')
+        wait('继续存档')
+        click('继续存档', direction='up')
+        click('李白')
+        (out / 'update-result.txt').write_text('启动检查、自动下载、系统安装确认、覆盖更新后存档恢复全部通过。', encoding='utf-8')
     (out / 'result.txt').write_text('离线启动、进入首层奇遇、保存并重启恢复全部通过。', encoding='utf-8')
 finally:
     subprocess.run(['adb', 'shell', 'screencap', '-p', '/sdcard/smoke.png'], check=False)
     subprocess.run(['adb', 'pull', '/sdcard/smoke.png', str(out / 'screen.png')], check=False)
     (out / 'logcat.txt').write_text(adb('logcat', '-d', '-t', '1000'), encoding='utf-8')
+

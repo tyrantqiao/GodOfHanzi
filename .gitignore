@@ -10,3 +10,5 @@ android/app/src/main/assets/
 android/local.properties
 android/*.jks
 .android-private/
+
+/dist/

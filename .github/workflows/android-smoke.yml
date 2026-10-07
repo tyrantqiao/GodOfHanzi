@@ -8,7 +8,7 @@ on:
       release_tag:
         description: 验证已发布的 APK
         required: true
-        default: android-v0.1.1
+        default: android-v0.1.2
 permissions:
   contents: read
 jobs:
@@ -26,8 +26,12 @@ jobs:
       - name: 下载实际发布安装包
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ inputs.release_tag || 'android-v0.1.1' }}
+          RELEASE_TAG: ${{ inputs.release_tag || 'android-v0.1.2' }}
         run: gh release download "$RELEASE_TAG" --pattern GodOfHanzi.apk --dir smoke-apk
+      - name: 下载更新前的版本
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release download android-v0.1.1 --pattern GodOfHanzi.apk --dir smoke-base
       - name: 启用模拟器加速
         run: sudo chmod 666 /dev/kvm
       - uses: reactivecircus/android-emulator-runner@v2
@@ -43,4 +47,5 @@ jobs:
         with:
           name: android-smoke-evidence
           path: smoke-evidence/
+
 

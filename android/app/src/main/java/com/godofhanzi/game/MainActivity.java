@@ -8,6 +8,8 @@ import android.net.Uri;
 import android.provider.Settings;
 import android.webkit.*;
 import android.widget.Toast;
+import android.widget.FrameLayout;
+import androidx.core.view.WindowCompat;
 import androidx.webkit.WebViewAssetLoader;
 import androidx.core.content.FileProvider;
 import org.json.*;
@@ -29,10 +31,14 @@ public class MainActivity extends Activity {
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
         web = new WebView(this);
-        setContentView(web);
-        web.setOnApplyWindowInsetsListener((view, insets) -> {
+        FrameLayout container = new FrameLayout(this);
+        container.addView(web, new FrameLayout.LayoutParams(-1, -1));
+        setContentView(container);
+        WindowCompat.getInsetsController(getWindow(), container).setAppearanceLightStatusBars(true);
+        WindowCompat.getInsetsController(getWindow(), container).setAppearanceLightNavigationBars(true);
+        container.setOnApplyWindowInsetsListener((view, insets) -> {
             view.setPadding(insets.getSystemWindowInsetLeft(), insets.getSystemWindowInsetTop(), insets.getSystemWindowInsetRight(), insets.getSystemWindowInsetBottom());
-            return insets;
+            return insets.consumeSystemWindowInsets();
         });
         web.getSettings().setJavaScriptEnabled(true);
         web.getSettings().setDomStorageEnabled(true);
@@ -141,3 +147,4 @@ public class MainActivity extends Activity {
     @Override public void onBackPressed() { if (web.canGoBack()) web.goBack(); else new AlertDialog.Builder(this).setMessage("请确认已保存进度，再离开试炼。").setPositiveButton("离开", (d, w) -> finish()).setNegativeButton("继续游玩", null).show(); }
     @Override protected void onDestroy() { alive = false; worker.shutdownNow(); web.destroy(); super.onDestroy(); }
 }
+
