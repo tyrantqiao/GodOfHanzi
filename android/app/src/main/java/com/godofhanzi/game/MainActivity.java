@@ -28,6 +28,7 @@ public class MainActivity extends Activity {
     private static final String RELEASE = "https://github.com/tyrantqiao/GodOfHanzi/releases/latest/download/";
     private final ExecutorService worker = Executors.newSingleThreadExecutor();
     private WebView web;
+    private androidx.core.graphics.Insets safeInsets = androidx.core.graphics.Insets.NONE;
     private File pendingApk;
     private boolean waitingPermission;
     private volatile boolean alive = true;
@@ -43,14 +44,17 @@ public class MainActivity extends Activity {
             : WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
         getWindow().setAttributes(attributes);
         web = new WebView(this);
+        web.setBackgroundColor(android.graphics.Color.rgb(21, 46, 50));
         FrameLayout container = new FrameLayout(this);
+        container.setBackgroundColor(android.graphics.Color.rgb(21, 46, 50));
         container.addView(web, new FrameLayout.LayoutParams(-1, -1));
         setContentView(container);
         enterImmersiveMode();
-        // 原生层只避让挖孔与手势边缘，系统栏临时出现时不挤压棋盘。
+        // 背景延伸到屏幕边缘，安全区传给网页，仅避让操作内容。
         ViewCompat.setOnApplyWindowInsetsListener(container, (view, insets) -> {
             androidx.core.graphics.Insets safe = insets.getInsets(WindowInsetsCompat.Type.displayCutout() | WindowInsetsCompat.Type.mandatorySystemGestures());
-            view.setPadding(safe.left, safe.top, safe.right, safe.bottom);
+            safeInsets = safe;
+            applySafeInsets();
             return WindowInsetsCompat.CONSUMED;
         });
         ViewCompat.requestApplyInsets(container);
@@ -79,7 +83,7 @@ public class MainActivity extends Activity {
                 WebResourceResponse response = loader.shouldInterceptRequest(uri);
                 return response != null ? response : new WebResourceResponse("text/plain", "UTF-8", 404, "Not Found", Collections.emptyMap(), new ByteArrayInputStream(new byte[0]));
             }
-            @Override public void onPageFinished(WebView view, String url) { updateStatus(updateMessage, checkingUpdate.get()); }
+            @Override public void onPageFinished(WebView view, String url) { applySafeInsets(); updateStatus(updateMessage, checkingUpdate.get()); }
             @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 return !"https".equals(request.getUrl().getScheme()) || !ORIGIN.equals(request.getUrl().getHost());
             }
@@ -89,6 +93,17 @@ public class MainActivity extends Activity {
         }, "HanziAndroid");
         web.loadUrl("https://" + ORIGIN + "/index.html");
         requestUpdate();
+    }
+
+    private void applySafeInsets() {
+        float density = getResources().getDisplayMetrics().density;
+        String script = "(function(){var s=document.documentElement.style;";
+        String[] edges = {"left", "top", "right", "bottom"};
+        int[] values = {safeInsets.left, safeInsets.top, safeInsets.right, safeInsets.bottom};
+        for (int i = 0; i < edges.length; i++) {
+            script += "s.setProperty('--safe-" + edges[i] + "','" + (values[i] / density) + "px');";
+        }
+        web.evaluateJavascript(script + "})();", null);
     }
 
     private void ui(Runnable action) { runOnUiThread(() -> { if (alive && !isFinishing()) action.run(); }); }
