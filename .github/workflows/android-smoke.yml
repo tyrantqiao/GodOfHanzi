@@ -1,14 +1,11 @@
 name: Android Smoke
 on:
-  push:
-    branches: ['codex/android-release']
-    paths: ['.github/workflows/android-smoke.yml', 'scripts/android-smoke.py']
   workflow_dispatch:
     inputs:
       release_tag:
         description: 验证已发布的 APK
         required: true
-        default: android-v0.1.2
+        default: android-v0.1.3
 permissions:
   contents: read
 jobs:
@@ -26,7 +23,7 @@ jobs:
       - name: 下载实际发布安装包
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ inputs.release_tag || 'android-v0.1.2' }}
+          RELEASE_TAG: ${{ inputs.release_tag || 'android-v0.1.3' }}
         run: gh release download "$RELEASE_TAG" --pattern GodOfHanzi.apk --pattern android-update.json --dir smoke-apk
       - name: 下载更新前的版本
         env:
@@ -47,6 +44,7 @@ jobs:
         with:
           name: android-smoke-evidence
           path: smoke-evidence/
+
 
 
 

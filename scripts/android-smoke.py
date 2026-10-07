@@ -108,12 +108,19 @@ try:
         wait('继续存档')
         click('继续存档', direction='up')
         click('古人对话 · 李白')
+        click('新一局', direction='up')
+        wait('放弃当前试炼')
+        click('确认')
+        wait('奇遇 ·')
+        click('继续存档', direction='up')
+        click('古人对话 · 李白')
         (out / 'update-result.txt').write_text('启动检查、自动下载、系统安装确认、覆盖更新后存档恢复全部通过。', encoding='utf-8')
     (out / 'result.txt').write_text('离线启动、进入首层奇遇、保存并重启恢复全部通过。', encoding='utf-8')
 finally:
     subprocess.run(['adb', 'shell', 'screencap', '-p', '/sdcard/smoke.png'], check=False)
     subprocess.run(['adb', 'pull', '/sdcard/smoke.png', str(out / 'screen.png')], check=False)
     (out / 'logcat.txt').write_text(adb('logcat', '-d', '-t', '1000'), encoding='utf-8')
+
 
 
 
