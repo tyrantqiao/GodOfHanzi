@@ -5,6 +5,29 @@ import { loadServerSave, saveServer } from './storage.js';
 const $ = s => document.querySelector(s);
 let config, legacyConfig, previousConfig, run, actions = [], seed, restMode = 'rest';
 const knownRecipes = new Set();
+// 横屏单屏：次要面板复用原有内容与渲染入口。
+for (const [selector, host] of [
+  ['.reference-panel', 'collection-dialog'], ['#event-atlas', 'event-book-dialog'],
+  ['#atlas', 'atlas-dialog'], ['#combo-panel', 'combo-dialog'],
+  ['#relics', 'relic-dialog'], ['#boss-hint', 'relic-dialog'], ['#starter', 'starter-dialog']
+]) $('#' + host).append($(selector));
+for (const trigger of document.querySelectorAll('[data-panel]')) trigger.onclick = () => {
+  const parent = trigger.closest('dialog'); if (parent) parent.close();
+  $('#' + trigger.dataset.panel).showModal();
+};
+for (const close of document.querySelectorAll('[data-close]')) close.onclick = () => close.closest('dialog').close();
+function inspectHandCard(id) {
+  if (run.phase !== 'battle') return;
+  const instance = run.deck.find(card => card.id === id), info = cardInfo(rules(), instance);
+  const dialog = $('#card-dialog'); $('#card-detail').replaceChildren();
+  cardButton(instance, $('#card-detail'), () => {}, true);
+  $('#card-title').textContent = '「' + info.char + '」 · ' + info.name;
+  $('#card-help').textContent = '消耗' + info.cost + '文气 · ' + text(info);
+  $('#card-play').disabled = info.cost > run.combat.energy;
+  $('#card-play').onclick = () => { dialog.close(); if (run.phase === 'battle' && run.combat.hand.includes(id)) requestPlay(id); };
+  dialog.showModal();
+}
+
 function rememberRecipes(keys) {
   for (const key of keys) if (Object.hasOwn(config.recipes, key)) knownRecipes.add(key);
   try { localStorage.setItem('hanzi-tower-recipes-v2', JSON.stringify([...knownRecipes])); } catch {}
@@ -126,6 +149,7 @@ function renderRest() {
   if (restMode === 'rest') cards.textContent = '生命充足时可强化或删牌。想要新字卡，请前往奇遇。';
 }
 function render() {
+  document.body.dataset.phase = run.phase; $('#combo-open').hidden = run.phase !== 'battle' || run.rulesVersion === 1; if (run.phase !== 'battle' && $('#combo-dialog').open) $('#combo-dialog').close();
   $('#title').textContent = `第${run.floor} / ${config.floors}层 · ${run.phase === 'won' ? '登顶' : run.phase === 'lost' ? '试炼结束' : '登塔修行'}`;
   $('#meta').textContent = `生命 ${run.hp}/${run.maxHp} · 牌册 ${run.deck.length}张${run.rulesVersion === 1 ? ' · 旧版试炼' : ''}`;
   $('#log').textContent = run.log; $('#log').hidden = run.phase.startsWith('event'); $('#choices').replaceChildren(); $('#hand').replaceChildren(); $('#deck').replaceChildren(); $('#relics').replaceChildren();
@@ -142,7 +166,7 @@ function render() {
     $('#enemy-status').textContent = `${c.elite ? '精英 · ' : ''}${c.enemy.name} ｜ 生命${c.enemyHp}/${c.enemy.hp}\n意图：${intent.base ? `攻击${intent.attack}` : '蓄力 · 本轮不攻击'} ｜ 护甲${intent.armor} ｜ 灼痕${c.burn}`;
     $('#piles').textContent = `第${c.round}回合 · 文气${c.energy}/${config.energy} · 格挡${c.block} · 蓄势${c.charge || 0}\n抽牌${c.draw.length} · 弃牌${c.discard.length} · 消耗${c.exhaust?.length || 0}`;
     for (const id of c.hand) {
-      const instance = run.deck.find(x => x.id === id), b = cardButton(instance, $('#hand'), () => requestPlay(id)); b.disabled = cardInfo(rules(), instance).cost > c.energy;
+      const instance = run.deck.find(x => x.id === id), b = cardButton(instance, $('#hand'), () => inspectHandCard(id)); b.disabled = cardInfo(rules(), instance).cost > c.energy;
       if (run.rulesVersion >= 2 && !c.stamped.includes(id)) {
         const mark = {id:c.nextMark, cardId:id, key:instance.key, flameTier:config.cards[instance.key].flameTier || 0};
         const projected = {...run, combat:{...c, marks:[...c.marks,mark].slice(-config.limits.marks)}};
@@ -196,7 +220,7 @@ function renderBook() {
 function showStarter() {
   if (!config) return;
   const preset = rules().presets?.[run?.starterId || 'beginner'] || config.presets.beginner;
-  $('#starter').hidden = false; $('#starter-name').textContent = preset.name; $('#starter-description').textContent = preset.description;
+  $('#starter').hidden = false; if (!$('#starter-dialog').open) $('#starter-dialog').showModal(); $('#starter-name').textContent = preset.name; $('#starter-description').textContent = preset.description;
   $('#starter-cards').replaceChildren(); $('#starter-tips').replaceChildren();
   for (const key of new Set(preset.cards)) {
     const b = cardButton({key}, $('#starter-cards'), () => {}, true), count = document.createElement('span'); count.className = 'card-quantity'; count.textContent = `×${preset.cards.filter(k => k === key).length}`; b.append(count);
@@ -204,8 +228,8 @@ function showStarter() {
   for (const tip of preset.strategy) { const li = document.createElement('li'); li.textContent = tip; $('#starter-tips').append(li); }
 }
 function reset() { if (!config) return; seed = Date.now() >>> 0; run = createRun(config, seed); actions = []; restMode = 'rest'; $('#status').textContent = ''; $('#effect').replaceChildren(); render(); }
-$('#starter-open').onclick = showStarter;
-$('#starter-close').onclick = () => { $('#starter').hidden = true; try { localStorage.setItem('hanzi-tower-starter-seen-v3', '1'); } catch {} };
+$('#starter-open').onclick = () => { $('#menu-dialog').close(); showStarter(); };
+$('#starter-close').onclick = () => { $('#starter').hidden = true; $('#starter-dialog').close(); try { localStorage.setItem('hanzi-tower-starter-seen-v3', '1'); } catch {} };
 $('#end').onclick = () => act('end');
 $('#restart').onclick = () => { if (run && (['lost','won'].includes(run.phase) || confirm('放弃当前试炼并开启新一局？'))) reset(); };
 $('#save').onclick = async () => {
@@ -223,7 +247,7 @@ $('#load').onclick = async () => {
   if (!restored) try { saved = JSON.parse(localStorage.getItem('hanzi-tower-save')); restored = restore(config, saved, legacyConfig, previousConfig); } catch {}
   if (!restored) { $('#status').textContent = '没有可重放的爬塔存档，或该存档内容版本不兼容；教学存档仍在原入口读取。'; return; }
   run = restored; seed = saved.seed; actions = structuredClone(saved.actions); restMode = 'rest'; rememberRecipes(run.discovered || []); $('#effect').replaceChildren(); render();
-  $('#starter').hidden = true; $('#status').textContent = run.rulesVersion < 3 ? '已按旧版原卡组与规则继续；新一局从刀盾开始奇遇成长。' : '已恢复试炼，包括奇遇题目、亲笔卡、术式与遗物。';
+  $('#starter').hidden = true; $('#starter-dialog').close(); $('#status').textContent = run.rulesVersion < 3 ? '已按旧版原卡组与规则继续；新一局从刀盾开始奇遇成长。' : '已恢复试炼，包括奇遇题目、亲笔卡、术式与遗物。';
 };
 Promise.all(['data/tower.json', 'data/tower-v1.json', 'data/tower-v2.json', 'data/tower-events.json'].map(url => fetch(url).then(r => { if (!r.ok) throw Error(); return r.json(); }))).then(([data, legacy, previous, library]) => {
   config = {...data, events:library.events}; legacyConfig = legacy; previousConfig = previous;

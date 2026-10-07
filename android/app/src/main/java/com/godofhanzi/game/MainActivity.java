@@ -153,7 +153,14 @@ public class MainActivity extends Activity {
     }
     @Override protected void onResume() { super.onResume(); if (web != null) web.onResume(); if (waitingPermission) { waitingPermission = false; if (getPackageManager().canRequestPackageInstalls()) installUpdate(); else notice("未开启安装权限，游戏仍可正常游玩"); } }
     @Override protected void onPause() { if (web != null) web.onPause(); super.onPause(); }
-    @Override public void onBackPressed() { if (web.canGoBack()) web.goBack(); else new AlertDialog.Builder(this).setMessage("请确认已保存进度，再离开试炼。").setPositiveButton("离开", (d, w) -> finish()).setNegativeButton("继续游玩", null).show(); }
+    // 返回键先收起游戏弹窗，再处理页面返回或离开试炼。
+    @Override public void onBackPressed() {
+        web.evaluateJavascript("(() => { const dialogs = [...document.querySelectorAll('dialog[open]')]; const dialog = dialogs.at(-1); if (!dialog) return false; dialog.close(); return true; })()", value -> {
+            if ("true".equals(value)) return;
+            if (web.canGoBack()) web.goBack();
+            else new AlertDialog.Builder(this).setMessage("请确认已保存进度，再离开试炼。").setPositiveButton("离开", (d, w) -> finish()).setNegativeButton("继续游玩", null).show();
+        });
+    }
     @Override protected void onDestroy() { alive = false; worker.shutdownNow(); web.destroy(); super.onDestroy(); }
 }
 

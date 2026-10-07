@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="zh-CN">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>汉字成圣 · 九层试炼</title><link rel="stylesheet" href="src/tower.css"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>汉字成圣 · 九层试炼</title><link rel="stylesheet" href="src/tower.css"></head>
 <body><main>
-<header><div class="brand"><span class="brand-seal">字</span><div>汉字成圣<small>九层试炼 · 字义成术</small></div></div><nav><button id="starter-open">开局卡组</button><button id="save">保存</button><button id="load">继续存档</button><button id="restart">新一局</button><a href="tutorial.html">制卡练习</a></nav></header>
+<header><div class="brand"><span class="brand-seal">字</span><div>汉字成圣<small>九层试炼 · 字义成术</small></div></div><nav><button data-panel="collection-dialog">牌册</button><button id="combo-open" data-panel="combo-dialog" hidden>凝式</button><button data-panel="menu-dialog">菜单</button></nav></header>
 <p id="status" role="status"></p>
 <section id="starter" class="starter-panel" aria-labelledby="starter-name" hidden><div class="starter-heading"><div><p class="eyebrow">赠予初行者 · 预设十张字卡</p><h2 id="starter-name"></h2></div><button id="starter-close">收下卡组 · 开始登塔</button></div><p id="starter-description"></p><div id="starter-cards"></div><ul id="starter-tips"></ul><p class="starter-note">开局只有刀与盾。前往奇遇论诗、答题或亲笔制卡，获得新的字，再尝试组合术式。</p></section>
 <section class="field"><div class="heading"><p class="eyebrow">一字一势 · 一念成式</p><h1 id="title"></h1><p id="meta"></p></div><img class="hero" src="src/assets/characters/shen-yan-ready-v2.png" alt="执笔修行者"><img class="enemy" src="src/assets/characters/frost-vine.png" alt="试炼妖物"><aside id="enemy-status"></aside><div id="effect" aria-hidden="true"></div></section>
@@ -18,4 +18,12 @@
 </section></main>
 <dialog id="picker" aria-labelledby="picker-title"><h2 id="picker-title"></h2><p id="picker-help"></p><div id="picker-cards"></div><div class="dialog-actions"><button id="picker-cancel">取消</button><button id="picker-confirm">确认出牌</button></div></dialog>
 <dialog id="craft-dialog" aria-labelledby="craft-title"><h2 id="craft-title" tabindex="-1">亲笔制卡</h2><p>沿浅色字谱临摹；覆盖≥65%、准确≥60%可得强化卡。低于标准仍得普通卡。未提交前不消耗机会；稳笔辅助可直接获得普通卡。</p><canvas id="craft-canvas" width="360" height="360" aria-label="亲笔临摹画布"></canvas><p id="craft-feedback" role="status"></p><div class="dialog-actions"><button id="craft-clear">重写</button><button id="craft-cancel">返回选字</button><button id="craft-assist">稳笔辅助 · 普通卡</button><button id="craft-submit">完成制卡</button></div></dialog>
-<script type="module" src="src/tower.js"></script></body></html>
+<dialog id="menu-dialog" aria-labelledby="menu-title"><div class="panel-heading"><h2 id="menu-title">行囊 · 试炼菜单</h2><button data-close>返回试炼</button></div><div class="menu-actions"><button id="starter-open">开局卡组</button><button id="save">保存</button><button id="load">继续存档</button><button id="restart">新一局</button><button data-panel="event-book-dialog">奇遇手册</button><button data-panel="atlas-dialog">术式图鉴</button><button data-panel="relic-dialog">遗物与塔顶</button><a href="tutorial.html">制卡练习</a></div></dialog>
+<dialog id="collection-dialog" aria-label="牌册"><div class="panel-heading"><h2>本局牌册</h2><button data-close>返回</button></div></dialog>
+<dialog id="event-book-dialog" aria-label="奇遇手册"><div class="panel-heading"><h2>奇遇手册</h2><button data-close>返回</button></div></dialog>
+<dialog id="atlas-dialog" aria-label="术式图鉴"><div class="panel-heading"><h2>术式图鉴</h2><button data-close>返回</button></div></dialog>
+<dialog id="relic-dialog" aria-label="遗物与塔顶"><div class="panel-heading"><h2>遗物与塔顶</h2><button data-close>返回</button></div></dialog>
+<dialog id="combo-dialog" aria-label="字印与术式"><div class="panel-heading"><h2>字印 · 凝式</h2><button data-close>返回战场</button></div></dialog>
+<dialog id="starter-dialog" aria-label="开局卡组"></dialog>
+<dialog id="card-dialog" aria-labelledby="card-title"><div class="panel-heading"><h2 id="card-title">字卡详情</h2><button data-close>取消</button></div><div id="card-detail"></div><p id="card-help"></p><div class="dialog-actions"><button id="card-play">确认出牌</button></div></dialog>
+<div class="rotate-hint" role="status">请横置屏幕，执笔登塔</div><script type="module" src="src/tower.js"></script></body></html>
