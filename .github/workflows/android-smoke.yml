@@ -1,0 +1,42 @@
+name: Android Smoke
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 验证已发布的 APK
+        required: true
+        default: android-v0.1.1
+permissions:
+  contents: read
+jobs:
+  offline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools emulator'
+      - name: 下载实际发布安装包
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        run: gh release download "$RELEASE_TAG" --pattern GodOfHanzi.apk --dir smoke-apk
+      - name: 启用模拟器加速
+        run: sudo chmod 666 /dev/kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disable-animations: true
+          script: python3 scripts/android-smoke.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: android-smoke-evidence
+          path: smoke-evidence/
