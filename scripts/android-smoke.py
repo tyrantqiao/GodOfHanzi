@@ -42,6 +42,10 @@ def wait(label, seconds=40):
         bounds = find(label)
         if bounds:
             return bounds
+        if label != '新版本已下载':
+            defer = find('稍后')
+            if defer:
+                adb('shell', 'input', 'tap', str((defer[0]+defer[2])//2), str((defer[1]+defer[3])//2))
         time.sleep(1)
     raise AssertionError('未出现界面内容：' + label)
 
@@ -60,6 +64,7 @@ def click(label, direction='down'):
 try:
     base = Path('smoke-base/GodOfHanzi.apk')
     adb('install', '-r', str(base if base.exists() else Path('smoke-apk/GodOfHanzi.apk')))
+    adb('shell', 'cmd', 'connectivity', 'airplane-mode', 'enable')
     adb('shell', 'svc', 'wifi', 'disable')
     adb('shell', 'svc', 'data', 'disable')
     adb('shell', 'am', 'start', '-n', 'com.godofhanzi.game/.MainActivity')
@@ -72,9 +77,10 @@ try:
     adb('shell', 'am', 'start', '-n', 'com.godofhanzi.game/.MainActivity')
     wait('继续存档')
     click('继续存档', direction='up')
-    click('李白')
+    click('古人对话 · 李白')
     if base.exists():
         adb('shell', 'appops', 'set', 'com.godofhanzi.game', 'REQUEST_INSTALL_PACKAGES', 'allow')
+        adb('shell', 'cmd', 'connectivity', 'airplane-mode', 'disable')
         adb('shell', 'svc', 'wifi', 'enable')
         adb('shell', 'svc', 'data', 'enable')
         adb('shell', 'am', 'force-stop', 'com.godofhanzi.game')
@@ -101,13 +107,14 @@ try:
         adb('shell', 'am', 'start', '-n', 'com.godofhanzi.game/.MainActivity')
         wait('继续存档')
         click('继续存档', direction='up')
-        click('李白')
+        click('古人对话 · 李白')
         (out / 'update-result.txt').write_text('启动检查、自动下载、系统安装确认、覆盖更新后存档恢复全部通过。', encoding='utf-8')
     (out / 'result.txt').write_text('离线启动、进入首层奇遇、保存并重启恢复全部通过。', encoding='utf-8')
 finally:
     subprocess.run(['adb', 'shell', 'screencap', '-p', '/sdcard/smoke.png'], check=False)
     subprocess.run(['adb', 'pull', '/sdcard/smoke.png', str(out / 'screen.png')], check=False)
     (out / 'logcat.txt').write_text(adb('logcat', '-d', '-t', '1000'), encoding='utf-8')
+
 
 
 
