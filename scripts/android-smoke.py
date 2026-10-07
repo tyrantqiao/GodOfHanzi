@@ -107,7 +107,8 @@ try:
             time.sleep(2)
         else:
             raise AssertionError('系统未完成覆盖更新')
-        adb('shell', 'am', 'start', '-n', 'com.godofhanzi.game/.MainActivity')
+        wait('Open', seconds=30)
+        click('Open')
         wait('继续存档')
         click('继续存档', direction='up')
         click('古人对话 · 李白')
@@ -123,6 +124,7 @@ finally:
     subprocess.run(['adb', 'shell', 'screencap', '-p', '/sdcard/smoke.png'], check=False)
     subprocess.run(['adb', 'pull', '/sdcard/smoke.png', str(out / 'screen.png')], check=False)
     (out / 'logcat.txt').write_text(adb('logcat', '-d', '-t', '1000'), encoding='utf-8')
+
 
 
 
