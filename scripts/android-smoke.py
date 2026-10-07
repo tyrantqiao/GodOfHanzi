@@ -14,13 +14,17 @@ def adb(*args):
 
 def dump():
     try:
-        adb('shell', 'uiautomator', 'dump', '/sdcard/window.xml')
-    except subprocess.CalledProcessError:
+        result = adb('shell', 'uiautomator', 'dump', '/sdcard/window.xml')
+        if 'dumped' not in result:
+            time.sleep(2)
+            return ET.Element('hierarchy')
+        raw = adb('shell', 'cat', '/sdcard/window.xml')
+        tree = ET.fromstring(raw)
+        (out / 'last-window.xml').write_text(raw, encoding='utf-8')
+        return tree
+    except (subprocess.CalledProcessError, ET.ParseError):
         time.sleep(2)
         return ET.Element('hierarchy')
-    raw = adb('shell', 'cat', '/sdcard/window.xml')
-    (out / 'last-window.xml').write_text(raw, encoding='utf-8')
-    return ET.fromstring(raw)
 
 def find(label):
     nodes = list(dump().iter('node'))
@@ -104,6 +108,7 @@ finally:
     subprocess.run(['adb', 'shell', 'screencap', '-p', '/sdcard/smoke.png'], check=False)
     subprocess.run(['adb', 'pull', '/sdcard/smoke.png', str(out / 'screen.png')], check=False)
     (out / 'logcat.txt').write_text(adb('logcat', '-d', '-t', '1000'), encoding='utf-8')
+
 
 
 
