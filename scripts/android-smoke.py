@@ -26,10 +26,12 @@ def dump():
         time.sleep(2)
         return ET.Element('hierarchy')
 
-def find(label):
+def find(label, clickable=False):
     nodes = list(dump().iter('node'))
     nodes.sort(key=lambda node: (node.get('text', '') + node.get('content-desc', '')).casefold() != label.casefold())
     for node in nodes:
+        if clickable and node.get('clickable') != 'true':
+            continue
         if label.casefold() in (node.get('text', '') + node.get('content-desc', '')).casefold():
             bounds = list(map(int, re.findall(r'\d+', node.get('bounds', ''))))
             if len(bounds) == 4 and bounds[2] > bounds[0] and bounds[3] > bounds[1]:
@@ -90,7 +92,7 @@ try:
         time.sleep(3)
         (out / 'installer-window.xml').write_text(ET.tostring(dump(), encoding='unicode'), encoding='utf-8')
         for label in ['Install', 'Update', '安装', '更新']:
-            bounds = find(label)
+            bounds = find(label, clickable=True)
             if bounds:
                 adb('shell', 'input', 'tap', str((bounds[0]+bounds[2])//2), str((bounds[1]+bounds[3])//2))
                 break
@@ -120,6 +122,7 @@ finally:
     subprocess.run(['adb', 'shell', 'screencap', '-p', '/sdcard/smoke.png'], check=False)
     subprocess.run(['adb', 'pull', '/sdcard/smoke.png', str(out / 'screen.png')], check=False)
     (out / 'logcat.txt').write_text(adb('logcat', '-d', '-t', '1000'), encoding='utf-8')
+
 
 
 
