@@ -1,5 +1,8 @@
 name: Android Smoke
 on:
+  push:
+    branches: ['codex/android-release']
+    paths: ['.github/workflows/android-smoke.yml', 'scripts/android-smoke.py']
   workflow_dispatch:
     inputs:
       release_tag:
@@ -23,7 +26,7 @@ jobs:
       - name: 下载实际发布安装包
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ inputs.release_tag }}
+          RELEASE_TAG: ${{ inputs.release_tag || 'android-v0.1.1' }}
         run: gh release download "$RELEASE_TAG" --pattern GodOfHanzi.apk --dir smoke-apk
       - name: 启用模拟器加速
         run: sudo chmod 666 /dev/kvm
@@ -40,3 +43,4 @@ jobs:
         with:
           name: android-smoke-evidence
           path: smoke-evidence/
+
