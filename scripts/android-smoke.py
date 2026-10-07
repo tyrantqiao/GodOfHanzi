@@ -3,6 +3,7 @@ import subprocess
 import time
 import xml.etree.ElementTree as ET
 import re
+import json
 from pathlib import Path
 
 out = Path('smoke-evidence')
@@ -75,10 +76,11 @@ try:
         wait('新版本已下载', seconds=240)
         click('安装更新')
         time.sleep(3)
-        click('安装')
+        click('Install')
         deadline = time.time() + 60
         while time.time() < deadline:
-            if 'versionCode=2 ' in adb('shell', 'dumpsys', 'package', 'com.godofhanzi.game'):
+            expected = json.loads(Path('smoke-apk/android-update.json').read_text())['versionCode']
+            if f'versionCode={expected} ' in adb('shell', 'dumpsys', 'package', 'com.godofhanzi.game'):
                 break
             time.sleep(2)
         else:
@@ -93,4 +95,5 @@ finally:
     subprocess.run(['adb', 'shell', 'screencap', '-p', '/sdcard/smoke.png'], check=False)
     subprocess.run(['adb', 'pull', '/sdcard/smoke.png', str(out / 'screen.png')], check=False)
     (out / 'logcat.txt').write_text(adb('logcat', '-d', '-t', '1000'), encoding='utf-8')
+
 

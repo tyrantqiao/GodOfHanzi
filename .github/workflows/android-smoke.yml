@@ -27,7 +27,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ inputs.release_tag || 'android-v0.1.2' }}
-        run: gh release download "$RELEASE_TAG" --pattern GodOfHanzi.apk --dir smoke-apk
+        run: gh release download "$RELEASE_TAG" --pattern GodOfHanzi.apk --pattern android-update.json --dir smoke-apk
       - name: 下载更新前的版本
         env:
           GH_TOKEN: ${{ github.token }}
@@ -47,5 +47,6 @@ jobs:
         with:
           name: android-smoke-evidence
           path: smoke-evidence/
+
 
 
