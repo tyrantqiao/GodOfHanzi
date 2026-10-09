@@ -1,3 +1,4 @@
+import { installUpdateControls } from './tower-updates.js';
 import { glyphStrokes, scoreCraft } from './tower-craft.js';
 import { createRun, cardInfo, applyAction, restore, enemyIntent } from './tower-core.js';
 import { availableCombos, missingIngredients } from './tower-combos.js';
@@ -60,18 +61,7 @@ function refreshSettings() {
   $('#settings-home').hidden = !runStarted || $('#game').hidden;
   $('#settings-tools').hidden = !runStarted || $('#game').hidden;
 }
-window.addEventListener('hanzi-update', event => {
-  $('#update-status').textContent = event.detail.message;
-  $('#check-update').disabled = event.detail.busy;
-});
-$('#check-update').onclick = () => {
-  if (!window.HanziAndroid?.checkUpdate) {
-    $('#update-status').textContent = '当前为网页版本；检测与安装更新请在安卓安装版中使用。'; return;
-  }
-  $('#check-update').disabled = true; $('#update-status').textContent = '正在检测新版本……';
-  try { window.HanziAndroid.checkUpdate(); }
-  catch { $('#check-update').disabled = false; $('#update-status').textContent = '无法启动更新检测，请稍后重试。'; }
-};
+installUpdateControls();
 $('#home-resume').onclick = enterGame;
 $('#home-start').onclick = () => {
   if (runStarted && !['won','lost'].includes(run.phase) && !confirm('放弃当前试炼并开启新一局？')) return;
@@ -443,6 +433,14 @@ $('#craft-canvas').onpointermove=event=>{
 };
 function finishInk(event){if(event.pointerId!==activePointer)return;if(activeStroke?.length===1)inkStrokes.pop();activePointer=null;activeStroke=null;drawCraft();}
 $('#craft-canvas').onpointerup=finishInk;$('#craft-canvas').onpointercancel=finishInk;
+// 系统手势或弹窗切换丢失捕获时，结束当前笔画，允许继续落笔与提交。
+$('#craft-canvas').onlostpointercapture=finishInk;
+$('#craft-dialog').addEventListener('close',()=>{
+ const canvas=$('#craft-canvas'),pointer=activePointer;
+ if(activeStroke?.length===1)inkStrokes.pop();
+ activePointer=null;activeStroke=null;
+ if(pointer!==null&&canvas.hasPointerCapture(pointer))canvas.releasePointerCapture(pointer);
+});
 $('#craft-clear').onclick=()=>{inkStrokes=[];activePointer=null;activeStroke=null;drawCraft();};
 $('#craft-cancel').onclick=()=>$('#craft-dialog').close();
 $('#craft-assist').onclick=()=>{if(run.phase!=='eventCraft')return;$('#craft-dialog').close();act('eventCraft',{key:craftKey,mode:'assist'});};

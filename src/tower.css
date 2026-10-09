@@ -272,3 +272,21 @@ header{padding-left:calc(12px + var(--safe-left));padding-right:calc(12px + var(
 body[data-phase="battle"] .hud{left:calc(14px + var(--safe-left));right:calc(14px + var(--safe-right));bottom:calc(8px + var(--safe-bottom));top:auto}
 @media(orientation:landscape) and (max-height:500px){.hud{top:calc(94px + var(--safe-top));left:calc(12px + var(--safe-left));right:calc(12px + var(--safe-right));bottom:calc(10px + var(--safe-bottom))}}
 @media(orientation:landscape) and (max-height:380px){.hud{top:calc(86px + var(--safe-top))}}
+/* 手机短屏：溢出内容从起点滚动，避免居中布局把首项挤出可达区域。 */
+.event-options{justify-content:flex-start;justify-content:safe center}
+.home-screen{min-height:0;overflow-y:auto;overscroll-behavior:contain}
+.home-actions{flex-shrink:0}
+@media(orientation:landscape) and (max-height:500px){
+ .home-screen{align-items:start}
+ .home-intro,.home-actions{margin-block:auto}
+}
+/* 制卡画布在窄横屏保持正方形，防止高度约束拉伸笔迹。 */
+#craft-canvas{height:auto;max-height:none;width:min(100%,65dvh)}
+#hand,.event-cards,.rest-cards{overscroll-behavior-x:contain}
+
+.update-settings { flex-wrap: wrap; }
+.update-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+#update-details, #update-progress, .update-help { flex-basis: 100%; width: 100%; margin: 0; }
+#update-progress { height: .7rem; accent-color: var(--cinnabar, #ac493b); }
+.update-help { font-size: .8rem; opacity: .8; }
+.update-settings [hidden] { display: none !important; }

@@ -34,6 +34,8 @@ jobs:
           gradle-version: '8.9'
       - name: 校验游戏规则
         run: npm test
+      - name: 校验更新断点续传
+        run: npm run test:android-update
       - name: 打包离线游戏
         run: node scripts/package-android.mjs
       - name: 构建固定签名安装包
@@ -58,7 +60,7 @@ jobs:
           gradle -p android --no-daemon assembleRelease
           mkdir -p dist/android
           cp android/app/build/outputs/apk/release/app-release.apk dist/android/GodOfHanzi.apk
-          node --input-type=module -e "import fs from 'node:fs'; import crypto from 'node:crypto'; const sha256=crypto.createHash('sha256').update(fs.readFileSync('dist/android/GodOfHanzi.apk')).digest('hex'); fs.writeFileSync('dist/android/android-update.json',JSON.stringify({versionCode:Number(process.env.ANDROID_VERSION_CODE),versionName:process.env.ANDROID_VERSION_NAME,sha256},null,2));"
+          node --input-type=module -e "import fs from 'node:fs'; import crypto from 'node:crypto'; const sha256=crypto.createHash('sha256').update(fs.readFileSync('dist/android/GodOfHanzi.apk')).digest('hex'); fs.writeFileSync('dist/android/android-update.json',JSON.stringify({versionCode:Number(process.env.ANDROID_VERSION_CODE),versionName:process.env.ANDROID_VERSION_NAME,size:fs.statSync('dist/android/GodOfHanzi.apk').size,sha256},null,2));"
           rm "$ANDROID_KEYSTORE"
       - uses: actions/upload-artifact@v4
         with:
@@ -69,4 +71,3 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release create "$GITHUB_REF_NAME" dist/android/* --title "汉字成圣 安卓 ${GITHUB_REF_NAME#android-v}" --notes "安卓离线爬塔版本；启动自动检查并下载更新，安装需系统确认。覆盖安装保留本地存档。支持 Android 9 及以上。"
-
